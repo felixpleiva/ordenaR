@@ -792,14 +792,29 @@ ${corrLine}
     node.dataset.id = author.id;
     if (opts.readOnlyOrder) node.classList.add("auto-sorted");
 
-    node.querySelectorAll("[data-f]").forEach(el => {
+        node.querySelectorAll("[data-f]").forEach(el => {
       const f = el.dataset.f;
       if (el.type === "checkbox") {
         el.checked = !!author[f];
       } else {
         el.value = author[f] == null ? "" : author[f];
       }
+      // Track IME composition (dead keys for accents áéíóúñ, CJK input, etc.).
+      // While composing, we must not re-render or otherwise disturb the input,
+      // or the partially-composed character is lost.
+      let composing = false;
+      el.addEventListener("compositionstart", () => { composing = true; });
+      el.addEventListener("compositionend", () => {
+        composing = false;
+        if (el.type !== "checkbox") {
+          author[f] = el.value;
+          if (["firstName", "middleName", "lastName"].includes(f)) updateAuthorSummary(node, author);
+          scheduleSave();
+          if (!opts.invite) scheduleRenderOutput();
+        }
+      });
       el.addEventListener("input", () => {
+        if (composing) return;
         if (el.type === "checkbox") {
           author[f] = el.checked;
           if (f === "equalContribution") {
@@ -813,14 +828,20 @@ ${corrLine}
         if (["firstName", "middleName", "lastName"].includes(f)) updateAuthorSummary(node, author);
         if (opts.onChange) opts.onChange();
         scheduleSave();
-        if (!opts.invite) renderOutput();
-        if (!opts.invite && (f === "lastName" || f === "firstName" || f === "senior" || f === "equalContribution" || f === "equalSymbol")) {
-          // re-render list to reflect new sort order
+        if (!opts.invite) scheduleRenderOutput();
+        if (!opts.invite && (f === "senior" || f === "equalContribution" || f === "equalSymbol")) {
           renderAuthors();
         }
       });
+      if (["firstName", "middleName", "lastName"].includes(f)) {
+        el.addEventListener("change", () => {
+          if (!opts.invite && state.sortMode === "alphabetical") {
+            renderAuthors();
+          }
+        });
+      }
     });
-
+    
     node.querySelector("[data-equal-symbol-wrap]").hidden = !author.equalContribution;
 
     // Affiliations
@@ -892,12 +913,20 @@ ${corrLine}
   function buildAffilRow(author, af, ai, rerender, opts) {
     const tpl = document.getElementById("affil-template");
     const node = tpl.content.firstElementChild.cloneNode(true);
-    node.querySelectorAll("[data-af]").forEach(el => {
+        node.querySelectorAll("[data-af]").forEach(el => {
       const k = el.dataset.af;
       el.value = af[k] || "";
-      el.addEventListener("input", () => {
+      let composing = false;
+      el.addEventListener("compositionstart", () => { composing = true; });
+      el.addEventListener("compositionend", () => {
+        composing = false;
         af[k] = el.value;
-        scheduleSave(); if (!opts || !opts.invite) renderOutput();
+        scheduleSave(); if (!opts || !opts.invite) scheduleRenderOutput();
+      });
+      el.addEventListener("input", () => {
+        if (composing) return;
+        af[k] = el.value;
+        scheduleSave(); if (!opts || !opts.invite) scheduleRenderOutput();
       });
     });
     node.querySelector(".btn-remove-affil").addEventListener("click", () => {
@@ -1287,7 +1316,9 @@ ${fullName(author)}`;
 
   let saveTimer = null;
   function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveState, 250); }
-
+  
+  let outputTimer = null;
+  function scheduleRenderOutput() { clearTimeout(outputTimer); outputTimer = setTimeout(renderOutput, 120); }
   function flashButton(btn, text) {
     const orig = btn.textContent;
     btn.textContent = text;
