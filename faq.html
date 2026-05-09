@@ -142,6 +142,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#how-do-i-handle-co-first-authors" id="toc-how-do-i-handle-co-first-authors" class="nav-link" data-scroll-target="#how-do-i-handle-co-first-authors">How do I handle co-first authors?</a></li>
   <li><a href="#can-i-have-multiple-equal-contribution-groups-e.g.-co-first-and-co-last" id="toc-can-i-have-multiple-equal-contribution-groups-e.g.-co-first-and-co-last" class="nav-link" data-scroll-target="#can-i-have-multiple-equal-contribution-groups-e.g.-co-first-and-co-last">Can I have multiple equal-contribution groups (e.g.&nbsp;co-first AND co-last)?</a></li>
   </ul></li>
+  <li><a href="#versioning-across-paper-revisions" id="toc-versioning-across-paper-revisions" class="nav-link" data-scroll-target="#versioning-across-paper-revisions">Versioning across paper revisions</a>
+  <ul class="collapse">
+  <li><a href="#my-paper-went-through-revisions-and-authors-changed-something.-do-i-have-to-ask-everyone-again" id="toc-my-paper-went-through-revisions-and-authors-changed-something.-do-i-have-to-ask-everyone-again" class="nav-link" data-scroll-target="#my-paper-went-through-revisions-and-authors-changed-something.-do-i-have-to-ask-everyone-again">My paper went through revisions and authors changed something. Do I have to ask everyone again?</a></li>
+  <li><a href="#should-i-save-a-json-backup-at-every-revision-stage" id="toc-should-i-save-a-json-backup-at-every-revision-stage" class="nav-link" data-scroll-target="#should-i-save-a-json-backup-at-every-revision-stage">Should I save a JSON backup at every revision stage?</a></li>
+  <li><a href="#what-if-i-switch-computers-or-browsers-between-revisions" id="toc-what-if-i-switch-computers-or-browsers-between-revisions" class="nav-link" data-scroll-target="#what-if-i-switch-computers-or-browsers-between-revisions">What if I switch computers or browsers between revisions?</a></li>
+  <li><a href="#does-ordenar-remember-which-journal-i-last-used" id="toc-does-ordenar-remember-which-journal-i-last-used" class="nav-link" data-scroll-target="#does-ordenar-remember-which-journal-i-last-used">Does ordenaR remember which journal I last used?</a></li>
+  </ul></li>
   <li><a href="#compatibility" id="toc-compatibility" class="nav-link" data-scroll-target="#compatibility">Compatibility</a>
   <ul class="collapse">
   <li><a href="#which-browsers-are-supported" id="toc-which-browsers-are-supported" class="nav-link" data-scroll-target="#which-browsers-are-supported">Which browsers are supported?</a></li>
@@ -225,6 +232,45 @@ ul.task-list li input[type="checkbox"] {
 <section id="can-i-have-multiple-equal-contribution-groups-e.g.-co-first-and-co-last" class="level3">
 <h3 class="anchored" data-anchor-id="can-i-have-multiple-equal-contribution-groups-e.g.-co-first-and-co-last">Can I have multiple equal-contribution groups (e.g.&nbsp;co-first AND co-last)?</h3>
 <p>Yes. Use one symbol (<code>*</code>) for the co-first group and a different symbol (<code>†</code>) for the co-last group. The output formats handle each group independently.</p>
+</section>
+</section>
+<section id="versioning-across-paper-revisions" class="level2">
+<h2 class="anchored" data-anchor-id="versioning-across-paper-revisions">Versioning across paper revisions</h2>
+<section id="my-paper-went-through-revisions-and-authors-changed-something.-do-i-have-to-ask-everyone-again" class="level3">
+<h3 class="anchored" data-anchor-id="my-paper-went-through-revisions-and-authors-changed-something.-do-i-have-to-ask-everyone-again">My paper went through revisions and authors changed something. Do I have to ask everyone again?</h3>
+<p>No.&nbsp;Three possibilities, in order of effort:</p>
+<ol type="1">
+<li><strong>You know the change</strong> (typo, new email, reordered authors) → just edit the field directly in the app and re-export.</li>
+<li><strong>One coauthor changed their info</strong> (new affiliation, new ORCID, redistributed CRediT) → click <strong>✉ Invite via email</strong> on their card. The email is pre-filled with their <em>current</em> data inside the <code>=== ORDENAR ENTRY ===</code> markers. They edit only what changed and reply. You paste the reply into <strong>Paste invitation reply</strong> — ordena<span class="brand-r">R</span> matches them by email and updates the card.</li>
+<li><strong>Many changes / many new authors</strong> → maintain a master Excel/CSV. When something changes, update the sheet and re-import via <strong>Import from Excel/CSV</strong>. Existing authors are matched by email and updated; new rows are added.</li>
+</ol>
+<p>The email field is the primary key for re-imports — keep emails stable across revisions.</p>
+</section>
+<section id="should-i-save-a-json-backup-at-every-revision-stage" class="level3">
+<h3 class="anchored" data-anchor-id="should-i-save-a-json-backup-at-every-revision-stage">Should I save a JSON backup at every revision stage?</h3>
+<p>Yes — strongly recommended. Click <strong>Export project (.json)</strong> every time you reach a stable milestone:</p>
+<ul>
+<li>Initial submission</li>
+<li>After each round of revisions</li>
+<li>Acceptance</li>
+<li>Final published version</li>
+</ul>
+<p>Name the files like <code>ordenaR-mypaper-v1-submission.json</code>, <code>ordenaR-mypaper-v2-revision1.json</code>, etc., and keep them in the same folder as your manuscript.</p>
+<p>This gives you a versioned history. If someone asks <em>“what affiliation did I list at submission?”</em> six months later, you reload the v1 JSON via <strong>Import project (.json)</strong> and see exactly what was sent.</p>
+</section>
+<section id="what-if-i-switch-computers-or-browsers-between-revisions" class="level3">
+<h3 class="anchored" data-anchor-id="what-if-i-switch-computers-or-browsers-between-revisions">What if I switch computers or browsers between revisions?</h3>
+<p>localStorage is browser-specific. Before switching:</p>
+<ol type="1">
+<li>On the old browser: <strong>Export project (.json)</strong>.</li>
+<li>Move the JSON file (email, Dropbox, Drive, USB).</li>
+<li>On the new browser: open ordena<span class="brand-r">R</span> → <strong>Import project (.json)</strong>.</li>
+</ol>
+<p>Everything is restored — authors, affiliations, CRediT, sort order, equal-contribution groups, current journal format.</p>
+</section>
+<section id="does-ordenar-remember-which-journal-i-last-used" class="level3">
+<h3 class="anchored" data-anchor-id="does-ordenar-remember-which-journal-i-last-used">Does ordenaR remember which journal I last used?</h3>
+<p>Yes. The selected output format and sort mode are saved with the project, so reopening (or re-importing the JSON) brings you back exactly where you left off.</p>
 </section>
 </section>
 <section id="compatibility" class="level2">
