@@ -547,7 +547,9 @@ ${corrLine}
     cell(s)            { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", equalContribMark: "†", emailLine: true, separator: "; ", presentLine: true, equalLine: true, leadContactLine: true }); },
     pnas(s)            { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "letters", correspondingMark: "*", emailLine: true,  separator: ", ", presentLine: true,  equalLine: true }); },
     elife(s)           { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", equalContribMark: "†", emailLine: true, separator: "; ", presentLine: true, equalLine: true }); },
+    mdpi(s)            { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", emailLine: true,  separator: "; ", presentLine: true,  equalLine: true, mdpiEmails: true }); },
     wiley(s)           { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", emailLine: true,  separator: ", ", presentLine: true,  equalLine: true }); },
+    frontiers(s)       { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", emailLine: true,  separator: ", ", presentLine: true,  equalLine: true }); },
     "royal-society"(s) { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "*", emailLine: true,  separator: ", ", presentLine: true,  equalLine: true }); },
     "nature-comms"(s)  { return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "✉",  equalContribMark: "†", emailLine: true, separator: ", ", presentLine: true,  equalLine: true }); },
     "nature-methods"(s){ return renderNumberedPlain(displayedAuthors(), s, { affiliationStyle: "numbers", correspondingMark: "✉",  equalContribMark: "†", emailLine: true, separator: ", ", presentLine: true,  equalLine: true }); },
@@ -789,8 +791,22 @@ ${corrLine}
     const node = tpl.content.firstElementChild.cloneNode(true);
     node.dataset.id = author.id;
     if (opts.readOnlyOrder) node.classList.add("auto-sorted");
+    // Inject the position number badge into the card header.
+    if (opts.position && opts.total) {
+      const head = node.querySelector(".author-head");
+      if (head) {
+        const pos = document.createElement("span");
+        pos.className = "author-position";
+        pos.textContent = String(opts.position);
+        pos.title = `Position ${opts.position} of ${opts.total}`;
+        // Insert after the drag handle
+        const handle = head.querySelector(".drag-handle");
+        if (handle && handle.nextSibling) head.insertBefore(pos, handle.nextSibling);
+        else head.insertBefore(pos, head.firstChild);
+      }
+    }
 
-        node.querySelectorAll("[data-f]").forEach(el => {
+    node.querySelectorAll("[data-f]").forEach(el => {
       const f = el.dataset.f;
       if (el.type === "checkbox") {
         el.checked = !!author[f];
@@ -804,6 +820,7 @@ ${corrLine}
       el.addEventListener("compositionstart", () => { composing = true; });
       el.addEventListener("compositionend", () => {
         composing = false;
+        // Sync the final composed value into state and refresh dependent UI.
         if (el.type !== "checkbox") {
           author[f] = el.value;
           if (["firstName", "middleName", "lastName"].includes(f)) updateAuthorSummary(node, author);
@@ -827,10 +844,15 @@ ${corrLine}
         if (opts.onChange) opts.onChange();
         scheduleSave();
         if (!opts.invite) scheduleRenderOutput();
+        // Re-render of the author list (for alphabetical sort) is deferred to the
+        // 'change' event (blur) below — re-rendering on every keystroke destroys
+        // the focused input and makes typing feel laggy.
         if (!opts.invite && (f === "senior" || f === "equalContribution" || f === "equalSymbol")) {
           renderAuthors();
         }
       });
+      // When the user finishes editing a name field (blur or Enter), re-render
+      // the list so alphabetical sort updates without disrupting typing.
       if (["firstName", "middleName", "lastName"].includes(f)) {
         el.addEventListener("change", () => {
           if (!opts.invite && state.sortMode === "alphabetical") {
@@ -839,7 +861,7 @@ ${corrLine}
         });
       }
     });
-    
+
     node.querySelector("[data-equal-symbol-wrap]").hidden = !author.equalContribution;
 
     // Affiliations
@@ -911,9 +933,10 @@ ${corrLine}
   function buildAffilRow(author, af, ai, rerender, opts) {
     const tpl = document.getElementById("affil-template");
     const node = tpl.content.firstElementChild.cloneNode(true);
-        node.querySelectorAll("[data-af]").forEach(el => {
+    node.querySelectorAll("[data-af]").forEach(el => {
       const k = el.dataset.af;
       el.value = af[k] || "";
+      // IME composition guard so accents/dead keys work in affiliation fields too.
       let composing = false;
       el.addEventListener("compositionstart", () => { composing = true; });
       el.addEventListener("compositionend", () => {
@@ -939,13 +962,35 @@ ${corrLine}
 
   function updateAuthorSummary(card, a) {
     const name = fullName(a) || "(unnamed author)";
-    const flags = [
-      a.corresponding ? "✉ corresponding" : null,
-      a.equalContribution ? `${a.equalSymbol || "†"} equal contribution` : null,
-      a.senior ? "★ senior" : null,
-      a.deceased ? "§ deceased" : null
-    ].filter(Boolean).join(" · ");
-    card.querySelector(".author-summary").textContent = flags ? `${name} — ${flags}` : name;
+    const summaryEl = card.querySelector(".author-summary");
+    summaryEl.innerHTML = "";
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "author-name-text";
+    if (!fullName(a)) nameSpan.classList.add("is-unnamed");
+    nameSpan.textContent = name;
+    summaryEl.appendChild(nameSpan);
+    const badges = document.createElement("span");
+    badges.className = "author-badges";
+    const make = (cls, label, title) => {
+      const b = document.createElement("span");
+      b.className = `author-badge ${cls}`;
+      b.textContent = label;
+      if (title) b.title = title;
+      return b;
+    };
+    if (a.corresponding) badges.appendChild(make("badge-corresponding", "✉ Corresponding", "Corresponding author"));
+    if (a.equalContribution) badges.appendChild(make("badge-equal", `${a.equalSymbol || "†"} Equal contribution`, "Shares an equal-contribution group"));
+    if (a.senior) badges.appendChild(make("badge-senior", "★ Senior", "Senior author"));
+    if (a.deceased) badges.appendChild(make("badge-deceased", "§ Deceased", "Deceased"));
+    if (badges.children.length) summaryEl.appendChild(badges);
+    // Update card-level data attributes so CSS can style accent borders.
+    const cardEl = card.classList.contains("author-card") ? card : card.closest(".author-card");
+    if (cardEl) {
+      cardEl.dataset.corresponding = a.corresponding ? "true" : "false";
+      cardEl.dataset.senior = a.senior ? "true" : "false";
+      cardEl.dataset.equal = a.equalContribution ? "true" : "false";
+      cardEl.dataset.deceased = a.deceased ? "true" : "false";
+    }
   }
 
   function validateEmailField(input, card) {
@@ -1006,7 +1051,8 @@ ${corrLine}
     listEl.innerHTML = "";
     const ordered = displayedAuthors();
     const readOnlyOrder = state.sortMode !== "manual";
-    ordered.forEach(a => listEl.appendChild(buildAuthorCard(a, { readOnlyOrder })));
+    const total = ordered.length;
+    ordered.forEach((a, i) => listEl.appendChild(buildAuthorCard(a, { readOnlyOrder, position: i + 1, total })));
     emptyEl.hidden = state.authors.length > 0;
 
     // Sort note
@@ -1314,9 +1360,13 @@ ${fullName(author)}`;
 
   let saveTimer = null;
   function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveState, 250); }
-  
+
+  // Debounced output re-render. Regenerating the formatted byline on every
+  // keystroke is expensive (39 journal renderers, full string ops); deferring
+  // by ~120ms keeps the output in sync without making typing feel laggy.
   let outputTimer = null;
   function scheduleRenderOutput() { clearTimeout(outputTimer); outputTimer = setTimeout(renderOutput, 120); }
+
   function flashButton(btn, text) {
     const orig = btn.textContent;
     btn.textContent = text;
@@ -2198,4 +2248,327 @@ ${corr ? fullName(corr) : ""}`;
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+})();
+
+/* ============================================================
+   ===== WIZARD v3 (Mockup 2): 3 steps + author modal w/ tabs =====
+   This module is INDEPENDENT from the IIFE above. It listens to
+   DOM changes on the original #authors-list (now hidden) and:
+     1) Mirrors each author-card into a compact row (#authors-row-list)
+     2) Opens a modal containing the original card distributed across
+        4 tabs (Identity / Affiliations / CRediT / Profiles)
+   All existing logic (autosave, IME guards, drag-drop, validation,
+   journals, docx, import/export, invite mode, etc.) is preserved.
+   ============================================================ */
+(function wizardInit() {
+  function $(s, c=document) { return c.querySelector(s); }
+  function $$(s, c=document) { return Array.from(c.querySelectorAll(s)); }
+
+  function ready() {
+    const inviteView = document.getElementById("invite-view");
+    if (inviteView && !inviteView.hidden) {
+      // Coauthor invite mode: do NOT show the wizard.
+      return;
+    }
+
+    /* ---------- Stepper navigation ---------- */
+    const stepper = document.querySelector(".wizard-stepper");
+    const stepPanels = $$("[data-step-panel]");
+    const stepEls = $$(".wizard-stepper .step");
+    const progressBar = document.getElementById("stepper-progress-bar");
+
+    function goToStep(n) {
+      stepPanels.forEach(p => p.hidden = (parseInt(p.dataset.stepPanel,10) !== n));
+      stepEls.forEach(s => {
+        const sn = parseInt(s.dataset.step,10);
+        s.classList.remove("is-active", "is-done");
+        if (sn === n) s.classList.add("is-active");
+        if (sn < n) s.classList.add("is-done");
+        s.setAttribute("aria-selected", sn === n ? "true" : "false");
+      });
+      if (progressBar) progressBar.style.width = ((n - 1) / 2 * 100) + "%";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    stepEls.forEach(el => {
+      el.addEventListener("click", () => goToStep(parseInt(el.dataset.step, 10)));
+      el.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); }
+      });
+    });
+    document.querySelectorAll("[data-go-step]").forEach(btn => {
+      btn.addEventListener("click", () => goToStep(parseInt(btn.dataset.goStep, 10)));
+    });
+
+    goToStep(1);
+
+    /* ---------- Author row mirror ---------- */
+    const hiddenList = document.getElementById("authors-list");      // mount of full author-cards
+    const rowList = document.getElementById("authors-row-list");
+    const emptyEl = document.getElementById("empty-state");
+    if (!hiddenList || !rowList) return;
+
+    function readField(card, name) {
+      const el = card.querySelector(`[data-f="${name}"]`);
+      if (!el) return "";
+      if (el.type === "checkbox") return el.checked;
+      return (el.value || "").trim();
+    }
+
+    function buildRow(card, idx) {
+      const first = readField(card, "firstName");
+      const middle = readField(card, "middleName");
+      const last = readField(card, "lastName");
+      const email = readField(card, "email");
+      const orcid = readField(card, "orcid");
+      const corresponding = readField(card, "corresponding");
+      const equalC = readField(card, "equalContribution");
+      const senior = readField(card, "senior");
+      const deceased = readField(card, "deceased");
+
+      const fullName = [first, middle, last].filter(Boolean).join(" ").trim();
+      const row = document.createElement("div");
+      row.className = "author-row";
+      if (corresponding) row.classList.add("is-corresponding");
+      else if (equalC) row.classList.add("is-equal");
+      else if (senior) row.classList.add("is-senior");
+      if (deceased) row.classList.add("is-deceased");
+      row.dataset.cardIndex = idx;
+      row.tabIndex = 0;
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-label", `Edit ${fullName || "author " + (idx+1)}`);
+
+      const handle = document.createElement("span");
+      handle.className = "row-handle";
+      handle.textContent = "⋮⋮";
+      handle.setAttribute("aria-hidden", "true");
+      row.appendChild(handle);
+
+      const bubble = document.createElement("span");
+      bubble.className = "row-bubble";
+      bubble.textContent = String(idx + 1);
+      row.appendChild(bubble);
+
+      const main = document.createElement("div");
+      main.className = "row-main";
+      const nameEl = document.createElement("span");
+      nameEl.className = "row-name";
+      if (fullName) nameEl.textContent = fullName;
+      else { nameEl.textContent = "Unnamed author"; nameEl.classList.add("is-empty"); }
+      main.appendChild(nameEl);
+
+      const meta = document.createElement("span");
+      meta.className = "row-meta";
+      if (email) {
+        const m = document.createElement("span");
+        m.textContent = email;
+        meta.appendChild(m);
+      }
+      if (orcid) {
+        const m = document.createElement("span");
+        m.textContent = orcid;
+        meta.appendChild(m);
+      }
+      if (!email && !orcid) {
+        const m = document.createElement("span");
+        m.className = "row-warning";
+        m.textContent = "Missing email & ORCID";
+        meta.appendChild(m);
+      } else if (!orcid) {
+        const m = document.createElement("span");
+        m.className = "row-warning";
+        m.textContent = "ORCID missing";
+        meta.appendChild(m);
+      }
+      main.appendChild(meta);
+      row.appendChild(main);
+
+      const badges = document.createElement("span");
+      badges.className = "row-badges";
+      if (corresponding) badges.appendChild(makeBadge("✉ Corresponding", "b-corr"));
+      if (equalC) badges.appendChild(makeBadge("* Equal contribution", "b-equal"));
+      if (senior) badges.appendChild(makeBadge("★ Senior", "b-senior"));
+      if (deceased) badges.appendChild(makeBadge("§ Deceased", "b-deceased"));
+      row.appendChild(badges);
+
+      const editLink = document.createElement("span");
+      editLink.className = "row-edit";
+      editLink.textContent = "Edit →";
+      row.appendChild(editLink);
+
+      row.addEventListener("click", e => {
+        if (e.target.closest(".row-handle")) return;
+        openModalForCard(card, idx);
+      });
+      row.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModalForCard(card, idx); }
+      });
+
+      // Drag handle pass-through to the original drag-handle inside the hidden card
+      handle.draggable = true;
+      handle.addEventListener("dragstart", e => {
+        const orig = card.querySelector(".drag-handle");
+        if (!orig) return;
+        // forward dragstart to original handle by simulating
+        const dt = e.dataTransfer;
+        dt.effectAllowed = "move";
+        dt.setData("text/plain", String(idx));
+        row.classList.add("is-dragging");
+      });
+      handle.addEventListener("dragend", () => row.classList.remove("is-dragging"));
+      row.addEventListener("dragover", e => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; row.classList.add("is-drop-target"); });
+      row.addEventListener("dragleave", () => row.classList.remove("is-drop-target"));
+      row.addEventListener("drop", e => {
+        e.preventDefault();
+        row.classList.remove("is-drop-target");
+        const fromIdx = parseInt(e.dataTransfer.getData("text/plain"), 10);
+        if (Number.isNaN(fromIdx) || fromIdx === idx) return;
+        // Reorder by triggering drag/drop on the hidden cards' drag-handles
+        const cards = $$("#authors-list .author-card");
+        if (!cards[fromIdx] || !cards[idx]) return;
+        // Manual reorder of cards then dispatch a synthetic event the original logic listens to.
+        // Easiest: move the DOM and manually dispatch an "input" so save fires.
+        const target = cards[idx];
+        const moving = cards[fromIdx];
+        if (fromIdx < idx) target.after(moving);
+        else target.before(moving);
+        // Inform the IIFE via a custom event (safe no-op if not listened to)
+        document.dispatchEvent(new CustomEvent("ordenaR:rowsReordered"));
+        // Force a save by dispatching input on the moving card's first input
+        const firstInput = moving.querySelector("input,textarea,select");
+        if (firstInput) firstInput.dispatchEvent(new Event("change", { bubbles: true }));
+        rebuildRows();
+      });
+
+      return row;
+    }
+    function makeBadge(text, cls) {
+      const b = document.createElement("span");
+      b.className = "row-badge " + cls;
+      b.textContent = text;
+      return b;
+    }
+
+    function rebuildRows() {
+      const cards = $$("#authors-list .author-card");
+      rowList.innerHTML = "";
+      cards.forEach((c, i) => rowList.appendChild(buildRow(c, i)));
+      if (emptyEl) emptyEl.hidden = cards.length > 0;
+    }
+
+    /* Observe the hidden list so any external render keeps the rows synced. */
+    const mo = new MutationObserver(() => {
+      // If the modal is open with a card mounted in it, don't disturb it.
+      if (modalOpen) return;
+      rebuildRows();
+    });
+    mo.observe(hiddenList, { childList: true, subtree: true, characterData: true, attributes: true });
+    rebuildRows();
+
+    /* ---------- MODAL ---------- */
+    const modal = document.getElementById("author-modal-overlay");
+    const modalBody = document.getElementById("author-modal-body");
+    const modalTitle = document.getElementById("author-modal-title");
+    const modalSubtitle = document.getElementById("author-modal-subtitle");
+    const modalBubble = document.getElementById("author-modal-bubble");
+    const tabsNav = modal.querySelector(".author-modal-tabs");
+    const closeBtns = ["btn-author-modal-close", "btn-author-modal-cancel"].map(id => document.getElementById(id));
+    const saveBtn = document.getElementById("btn-author-modal-save");
+    const removeBtn = document.getElementById("btn-author-modal-remove");
+    let modalOpen = false;
+    let activeCard = null;
+    let activeCardOriginalParent = null;
+    let activeCardOriginalNext = null;
+
+    function openModalForCard(card, idx) {
+      if (modalOpen) closeModal(false);
+      activeCard = card;
+      activeCardOriginalParent = card.parentNode;
+      activeCardOriginalNext = card.nextSibling;
+      modalBody.appendChild(card);
+      modalOpen = true;
+      modal.hidden = false;
+      // Update header
+      const first = readField(card, "firstName");
+      const last = readField(card, "lastName");
+      const middle = readField(card, "middleName");
+      const fullName = [first, middle, last].filter(Boolean).join(" ").trim() || `Author ${idx + 1}`;
+      modalTitle.textContent = fullName;
+      modalBubble.textContent = String(idx + 1);
+      const email = readField(card, "email");
+      modalSubtitle.textContent = email || "";
+      // Activate Identity tab by default
+      activateTab("identity");
+      // Focus first input
+      setTimeout(() => {
+        const firstInput = card.querySelector('[data-tab-pane="identity"] input');
+        if (firstInput) firstInput.focus();
+      }, 80);
+    }
+
+    function closeModal(triggerSave) {
+      if (!modalOpen) return;
+      // First, fire a 'change' on the active card so the IIFE captures any
+      // last-typed values into state and triggers a fresh renderAuthors().
+      // That render will WIPE the hidden list (innerHTML="") and rebuild
+      // all author-cards from state, so we MUST NOT move our orphan card back.
+      if (triggerSave && activeCard) {
+        const last = activeCard.querySelector('[data-f="lastName"]');
+        if (last) last.dispatchEvent(new Event("change", { bubbles: true }));
+        else {
+          const anyInput = activeCard.querySelector('input,textarea,select');
+          if (anyInput) anyInput.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+      modalOpen = false;
+      modal.hidden = true;
+      // Detach the orphan card; it's no longer needed (state is the source of truth).
+      if (activeCard && activeCard.parentNode === modalBody) {
+        modalBody.removeChild(activeCard);
+      }
+      activeCard = null;
+      activeCardOriginalParent = null;
+      activeCardOriginalNext = null;
+      rebuildRows();
+    }
+
+    function activateTab(name) {
+      tabsNav.querySelectorAll(".tab").forEach(t => {
+        const isActive = t.dataset.tab === name;
+        t.classList.toggle("is-active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      if (activeCard) {
+        activeCard.querySelectorAll("[data-tab-pane]").forEach(pane => {
+          pane.hidden = pane.dataset.tabPane !== name;
+        });
+      }
+    }
+
+    tabsNav.addEventListener("click", e => {
+      const t = e.target.closest(".tab");
+      if (!t) return;
+      activateTab(t.dataset.tab);
+    });
+
+    closeBtns.forEach(b => b && b.addEventListener("click", () => closeModal(true)));
+    saveBtn.addEventListener("click", () => closeModal(true));
+    modal.addEventListener("click", e => { if (e.target === modal) closeModal(true); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && modalOpen) closeModal(true); });
+
+    removeBtn.addEventListener("click", () => {
+      if (!activeCard) return;
+      if (!confirm("Remove this author? This cannot be undone.")) return;
+      const inner = activeCard.querySelector(".btn-remove-author");
+      // Move card back first, then trigger removal.
+      const cardRef = activeCard;
+      closeModal(false);
+      if (inner) inner.click();
+      else cardRef.remove();
+      rebuildRows();
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready);
+  else ready();
 })();
