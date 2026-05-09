@@ -2,7 +2,7 @@
 
 > **Arrange authors, affiliations, and ORCIDs — without the Excel chaos.**
 
-A free, open-source, browser-only tool that helps academic authors generate properly formatted author/affiliation/email/ORCID lists for paper submissions, and reformat them when journals change or affiliations shift during peer review.
+A free, open-source, browser-only tool that helps academic authors generate formatted author/affiliation/email/ORCID lists for paper submissions, and reformat them when journals change or affiliations shift during peer review.
 
 🌐 Live site: <https://felixpleiva.github.io/ordenaR/>
 📦 Source: <https://github.com/felixpleiva/ordenaR>
