@@ -78,106 +78,140 @@
        NORMAL MODE — corresponding author's main editing view.
        ============================================================ -->
   <main class="app-main normal-mode" id="normal-view">
-    <section class="project-bar" aria-label="Project metadata">
-      <label for="project-title" class="project-label">Project title</label>
-      <input id="project-title" type="text" placeholder="e.g. Effects of climate on amphibian populations" aria-label="Project title" />
-      <div class="project-actions">
-        <button type="button" id="btn-add-author" class="btn btn-primary" aria-label="Add new author">+ Add author</button>
-        <button type="button" id="btn-import-spreadsheet" class="btn" aria-label="Import authors from Excel or CSV spreadsheet">📥 Import from spreadsheet (Excel/CSV)</button>
-        <input type="file" id="file-import-spreadsheet" accept=".xlsx,.xls,.csv,.tsv,.ods" hidden />
-        <button type="button" id="btn-reset" class="btn btn-danger" aria-label="Reset and clear all">Reset</button>
+    <!-- ===== WIZARD STEPPER ===== -->
+    <nav class="wizard-stepper" aria-label="Wizard progress">
+      <ol class="steps" role="tablist">
+        <li class="step is-active" data-step="1" role="tab" aria-selected="true" tabindex="0">
+          <span class="step-num">1</span>
+          <span class="step-label">Project</span>
+        </li>
+        <li class="step" data-step="2" role="tab" aria-selected="false" tabindex="0">
+          <span class="step-num">2</span>
+          <span class="step-label">Authors</span>
+        </li>
+        <li class="step" data-step="3" role="tab" aria-selected="false" tabindex="0">
+          <span class="step-num">3</span>
+          <span class="step-label">Export</span>
+        </li>
+      </ol>
+      <div class="stepper-progress"><span id="stepper-progress-bar" style="width:0%"></span></div>
+    </nav>
+
+    <!-- ===== STEP 1 — Project info ===== -->
+    <section class="wizard-step" data-step-panel="1" aria-labelledby="step1-title">
+      <header class="step-head">
+        <h2 id="step1-title">Project info</h2>
+        <p class="step-sub">Start by giving your project a title. You can come back to this anytime.</p>
+      </header>
+      <div class="step-card">
+        <label class="field-block" for="project-title">Project title
+          <input id="project-title" type="text" placeholder="e.g. Effects of climate on amphibian populations" aria-label="Project title" />
+        </label>
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button type="button" class="btn btn-primary btn-lg" data-go-step="2">Continue to Authors →</button>
       </div>
     </section>
 
-    <div class="layout">
-      <!-- LEFT COLUMN -->
-      <div class="left-col">
-        <section class="panel form-panel" aria-label="Authors form">
-          <div class="panel-head">
-            <h2>Authors</h2>
-            <span class="hint">Drag <span aria-hidden="true">⋮⋮</span> to reorder. Data autosaves locally.</span>
-          </div>
-          <div class="sort-toolbar" role="toolbar" aria-label="Sort authors">
-            <label class="sort-label">Sort:
-              <select id="sort-mode" aria-label="Author sort mode">
-                <option value="manual">Manual (drag &amp; drop)</option>
-                <option value="alpha">Alphabetical (by last name)</option>
-              </select>
-            </label>
-            <label class="chk inline">
-              <input type="checkbox" id="keep-senior-end" />
-              Keep senior authors at the end
-            </label>
-            <span id="sort-note" class="sort-note" aria-live="polite"></span>
-          </div>
+    <!-- ===== STEP 2 — Authors ===== -->
+    <section class="wizard-step" data-step-panel="2" aria-labelledby="step2-title" hidden>
+      <header class="step-head">
+        <h2 id="step2-title">Authors</h2>
+        <p class="step-sub">Add coauthors, edit details in the modal, and drag rows to reorder.</p>
+      </header>
 
-          <div id="authors-list" class="authors-list" aria-live="polite"></div>
-          <div class="empty-state" id="empty-state" hidden>
-            <p>No authors yet. Click <strong>+ Add author</strong> to begin.</p>
-          </div>
-        </section>
-
-        <!-- ===== INVITE PANEL — primary CTA ===== -->
-        <section class="panel invite-cta-panel" aria-label="Invite coauthors">
-          <div class="invite-cta-head">
-            <h2>Invite coauthors</h2>
-            <p class="hint">Send each coauthor a link. They fill in their own block and email the JSON back. No accounts, no logins.</p>
-          </div>
-          <div class="invite-cta-body">
-            <button type="button" id="btn-generate-invite" class="btn btn-primary btn-lg" aria-label="Generate invitation link">🔗 Generate invitation link</button>
-            <div id="invite-link-result" class="invite-link-result" hidden>
-              <label>Invitation link
-                <input type="text" id="invite-link-out" readonly aria-label="Invitation link" />
-              </label>
-              <div class="invite-link-actions">
-                <button type="button" id="btn-copy-invite" class="btn">Copy link</button>
-                <button type="button" id="btn-mail-invite" class="btn">Email it</button>
-              </div>
-              <small class="hint">Set yourself as <em>Corresponding author</em> with a valid email and a project title before generating, so coauthors know where to send their entry.</small>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===== GITHUB SOURCE BADGE (shown when project loaded from GitHub) ===== -->
-        <div id="github-source-badge" class="github-source-badge" hidden>
-          <span class="gh-icon" aria-hidden="true">📂</span>
-          <span>Loaded from <a id="gh-source-link" href="#" target="_blank" rel="noopener"></a> · <code id="gh-source-sha">…</code></span>
-          <button type="button" id="btn-gh-refresh" class="btn btn-sm" aria-label="Re-fetch authors.json from GitHub">Refresh</button>
+      <div class="authors-toolbar">
+        <div class="authors-toolbar-left">
+          <button type="button" id="btn-add-author" class="btn btn-primary" aria-label="Add new author">+ Add author</button>
+          <button type="button" id="btn-import-spreadsheet" class="btn" aria-label="Import authors from Excel or CSV spreadsheet">📥 Import from spreadsheet</button>
+          <input type="file" id="file-import-spreadsheet" accept=".xlsx,.xls,.csv,.tsv,.ods" hidden />
+          <button type="button" id="btn-generate-invite" class="btn" aria-label="Generate invitation link">🔗 Invite coauthor</button>
         </div>
-
-        <!-- ===== COAUTHOR ENTRIES PANEL ===== -->
-        <section class="panel coauthor-entries-panel" aria-label="Coauthor entries">
-          <details open>
-            <summary>
-              <h2>Coauthor entries</h2>
-              <span class="hint">Paste a coauthor's reply or drop their JSON. Review before merging.</span>
-            </summary>
-            <div class="entries-actions">
-              <button type="button" id="btn-paste-entry" class="btn">Paste from email</button>
-              <button type="button" id="btn-upload-entry" class="btn">Upload JSON file</button>
-              <input type="file" id="file-import-author" accept="application/json,.json,.txt" hidden />
-            </div>
-            <div id="paste-area-wrap" hidden>
-              <textarea id="paste-area" rows="8" placeholder="Paste the coauthor's email body or JSON here. The BEGIN/END markers will be detected automatically."></textarea>
-              <div class="entries-actions">
-                <button type="button" id="btn-paste-confirm" class="btn btn-primary">Detect entry</button>
-                <button type="button" id="btn-paste-cancel" class="btn">Cancel</button>
-              </div>
-            </div>
-            <div id="pending-list" class="pending-list" aria-live="polite"></div>
-            <p id="pending-empty" class="empty-state-sm">No pending entries. Coauthor JSON will appear here for review.</p>
-          </details>
-        </section>
-
-
+        <div class="authors-toolbar-right">
+          <label class="sort-label">Sort:
+            <select id="sort-mode" aria-label="Author sort mode">
+              <option value="manual">Manual (drag &amp; drop)</option>
+              <option value="alpha">Alphabetical (by last name)</option>
+            </select>
+          </label>
+          <label class="chk inline">
+            <input type="checkbox" id="keep-senior-end" />
+            Senior at end
+          </label>
+          <span id="sort-note" class="sort-note" aria-live="polite"></span>
+          <span class="autosave-pill" id="autosave-pill">Autosaved</span>
+        </div>
       </div>
 
-      <!-- RIGHT COLUMN: preview / output -->
-      <section class="panel preview-panel" aria-label="Live preview and export">
-        <div class="panel-head">
-          <h2>Output</h2>
-          <div class="format-select-wrap">
-            <label for="format-select" class="visually-hidden">Output format</label>
+      <!-- Invite link result (collapses below toolbar) -->
+      <div id="invite-link-result" class="invite-link-result" hidden>
+        <label>Invitation link
+          <input type="text" id="invite-link-out" readonly aria-label="Invitation link" />
+        </label>
+        <div class="invite-link-actions">
+          <button type="button" id="btn-copy-invite" class="btn">Copy link</button>
+          <button type="button" id="btn-mail-invite" class="btn">Email it</button>
+        </div>
+        <small class="hint">Set yourself as <em>Corresponding author</em> with a valid email and a project title before generating, so coauthors know where to send their entry.</small>
+      </div>
+
+      <!-- Authors row list (compact) -->
+      <div class="authors-row-list-wrap">
+        <div id="authors-row-list" class="authors-row-list" aria-live="polite"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <div class="empty-icon">👥</div>
+          <p><strong>No authors yet.</strong> Click <em>+ Add author</em> to get started, or import from a spreadsheet.</p>
+        </div>
+      </div>
+
+      <!-- GitHub source badge -->
+      <div id="github-source-badge" class="github-source-badge" hidden>
+        <span class="gh-icon" aria-hidden="true">📂</span>
+        <span>Loaded from <a id="gh-source-link" href="#" target="_blank" rel="noopener"></a> · <code id="gh-source-sha">…</code></span>
+        <button type="button" id="btn-gh-refresh" class="btn btn-sm" aria-label="Re-fetch authors.json from GitHub">Refresh</button>
+      </div>
+
+      <!-- Coauthor entries (collapsible) -->
+      <section class="coauthor-entries-panel" aria-label="Coauthor entries">
+        <details>
+          <summary>
+            <strong>Coauthor entries</strong>
+            <span class="hint">Paste a coauthor's reply or drop their JSON. Review before merging.</span>
+          </summary>
+          <div class="entries-actions">
+            <button type="button" id="btn-paste-entry" class="btn">Paste from email</button>
+            <button type="button" id="btn-upload-entry" class="btn">Upload JSON file</button>
+            <input type="file" id="file-import-author" accept="application/json,.json,.txt" hidden />
+          </div>
+          <div id="paste-area-wrap" hidden>
+            <textarea id="paste-area" rows="8" placeholder="Paste the coauthor's email body or JSON here. The BEGIN/END markers will be detected automatically."></textarea>
+            <div class="entries-actions">
+              <button type="button" id="btn-paste-confirm" class="btn btn-primary">Detect entry</button>
+              <button type="button" id="btn-paste-cancel" class="btn">Cancel</button>
+            </div>
+          </div>
+          <div id="pending-list" class="pending-list" aria-live="polite"></div>
+          <p id="pending-empty" class="empty-state-sm">No pending entries. Coauthor JSON will appear here for review.</p>
+        </details>
+      </section>
+
+      <div class="step-nav">
+        <button type="button" class="btn" data-go-step="1">← Back to Project</button>
+        <button type="button" class="btn btn-primary btn-lg" data-go-step="3">Continue to Export →</button>
+      </div>
+    </section>
+
+    <!-- ===== STEP 3 — Export ===== -->
+    <section class="wizard-step" data-step-panel="3" aria-labelledby="step3-title" hidden>
+      <header class="step-head">
+        <h2 id="step3-title">Export</h2>
+        <p class="step-sub">Pick a format and copy, download, or save a Word file.</p>
+      </header>
+
+      <div class="export-grid">
+        <div class="export-controls">
+          <label class="field-block" for="format-select">Output format
             <select id="format-select" aria-label="Output format">
               <optgroup label="Plain text — Generic">
                 <option value="nature">Nature / Science</option>
@@ -188,7 +222,9 @@
                 <option value="cell">Cell Press</option>
                 <option value="pnas">PNAS</option>
                 <option value="elife">eLife</option>
+                <option value="mdpi">MDPI generic</option>
                 <option value="wiley">Wiley generic</option>
+                <option value="frontiers">Frontiers</option>
                 <option value="royal-society">Royal Society</option>
                 <option value="nature-comms">Nature Communications</option>
                 <option value="nature-methods">Nature Methods</option>
@@ -230,32 +266,83 @@
                 <option value="credit">CRediT statement</option>
               </optgroup>
             </select>
+          </label>
+
+          <div class="output-actions">
+            <button type="button" id="btn-copy-output" class="btn btn-primary" aria-label="Copy output to clipboard">📋 Copy</button>
+            <button type="button" id="btn-download-output" class="btn" aria-label="Download output">⬇ Download</button>
+            <button type="button" id="btn-download-docx" class="btn" aria-label="Download Word .docx file">📄 Word (.docx)</button>
+          </div>
+
+          <div class="backup-panel">
+            <h3>Backup</h3>
+            <div class="entries-actions">
+              <button type="button" id="btn-export-project" class="btn btn-sm" aria-label="Download full project JSON">Export project JSON</button>
+              <button type="button" id="btn-import-project" class="btn btn-sm" aria-label="Load full project JSON">Import project JSON</button>
+              <button type="button" id="btn-export-csv" class="btn btn-sm" aria-label="Export CSV">Export CSV</button>
+              <input type="file" id="file-import-project" accept="application/json,.json" hidden />
+            </div>
+            <small class="hint">Master backup — keep one copy of the full project JSON in case your browser cache is cleared.</small>
+          </div>
+
+          <div class="reset-row">
+            <button type="button" id="btn-reset" class="btn btn-danger btn-sm" aria-label="Reset and clear all">Reset entire project</button>
           </div>
         </div>
 
-        <div class="output-actions">
-          <button type="button" id="btn-copy-output" class="btn" aria-label="Copy output to clipboard">Copy</button>
-          <button type="button" id="btn-download-output" class="btn" aria-label="Download output">Download</button>
-          <button type="button" id="btn-download-docx" class="btn" aria-label="Download Word .docx file">📄 Download Word (.docx)</button>
-        </div>
-
-        <pre id="output-preview" class="output-preview" tabindex="0" aria-label="Formatted output preview"></pre>
-        <div id="output-rich" class="output-rich" hidden aria-label="Rich preview"></div>
-
-        <!-- Backup (smaller, less prominent) -->
-        <div class="backup-panel">
-          <h3>Backup</h3>
-          <div class="entries-actions">
-            <button type="button" id="btn-export-project" class="btn btn-sm" aria-label="Download full project JSON">Export project JSON</button>
-            <button type="button" id="btn-import-project" class="btn btn-sm" aria-label="Load full project JSON">Import project JSON</button>
-            <button type="button" id="btn-export-csv" class="btn btn-sm" aria-label="Export CSV">Export CSV</button>
-            <input type="file" id="file-import-project" accept="application/json,.json" hidden />
+        <div class="export-preview-wrap">
+          <div class="export-preview-head">
+            <h3>Live preview</h3>
           </div>
-          <small class="hint">Master backup — keep one copy of the full project JSON in case your browser cache is cleared.</small>
+          <pre id="output-preview" class="output-preview" tabindex="0" aria-label="Formatted output preview"></pre>
+          <div id="output-rich" class="output-rich" hidden aria-label="Rich preview"></div>
         </div>
-      </section>
-    </div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn" data-go-step="2">← Back to Authors</button>
+        <span></span>
+      </div>
+    </section>
   </main>
+
+  <!-- ============================================================
+       AUTHOR EDITOR MODAL — with tabs (Identity / Affiliations / CRediT / Profiles)
+       ============================================================ -->
+  <div id="author-modal-overlay" class="author-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="author-modal-title" hidden>
+    <div class="author-modal">
+      <header class="author-modal-head">
+        <span class="author-modal-bubble" id="author-modal-bubble">1</span>
+        <div class="author-modal-titlewrap">
+          <h2 id="author-modal-title">Author</h2>
+          <span id="author-modal-subtitle" class="author-modal-sub"></span>
+        </div>
+        <button type="button" id="btn-author-modal-close" class="btn-icon" aria-label="Close author editor">×</button>
+      </header>
+
+      <nav class="author-modal-tabs" role="tablist" aria-label="Author sections">
+        <button type="button" class="tab is-active" data-tab="identity" role="tab" aria-selected="true">Identity</button>
+        <button type="button" class="tab" data-tab="affiliations" role="tab" aria-selected="false">Affiliations</button>
+        <button type="button" class="tab" data-tab="credit" role="tab" aria-selected="false">CRediT roles</button>
+        <button type="button" class="tab" data-tab="profiles" role="tab" aria-selected="false">Profiles</button>
+      </nav>
+
+      <div class="author-modal-body" id="author-modal-body">
+        <!-- The original author card is moved into here at runtime, with tabs toggling visibility -->
+      </div>
+
+      <footer class="author-modal-foot">
+        <button type="button" id="btn-author-modal-remove" class="btn btn-danger btn-sm">Remove author</button>
+        <div class="author-modal-foot-right">
+          <button type="button" id="btn-author-modal-cancel" class="btn">Close</button>
+          <button type="button" id="btn-author-modal-save" class="btn btn-primary">Save</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Hidden mount point for the editing author card (kept off-screen when modal is closed) -->
+  <div id="authors-list" class="authors-list authors-list-hidden" aria-hidden="true"></div>
 
   <footer class="app-footer">
     <small>ordena<span class="brand-r">R</span> · MIT licensed · Your data never leaves your browser.</small>
@@ -275,51 +362,60 @@
       </header>
 
       <div class="author-body">
-        <div class="grid-3">
-          <label>First name<input type="text" data-f="firstName" autocomplete="given-name" /></label>
-          <label>Middle name(s)<input type="text" data-f="middleName" /></label>
-          <label>Last name<input type="text" data-f="lastName" autocomplete="family-name" /></label>
-        </div>
-        <div class="grid-2">
-          <label>Email<input type="email" data-f="email" autocomplete="email" /><span class="field-msg" data-msg="email"></span></label>
-          <label>ORCID<input type="text" data-f="orcid" placeholder="0000-0000-0000-000X" /><span class="field-msg" data-msg="orcid"></span></label>
-        </div>
+        <!-- TAB: Identity -->
+        <section class="author-tab-pane is-active" data-tab-pane="identity">
+          <h3 class="tab-section-title">Personal details</h3>
+          <div class="grid-3">
+            <label>First name<input type="text" data-f="firstName" autocomplete="given-name" /></label>
+            <label>Middle name(s)<input type="text" data-f="middleName" /></label>
+            <label>Last name<input type="text" data-f="lastName" autocomplete="family-name" /></label>
+          </div>
+          <div class="grid-2">
+            <label>Email<input type="email" data-f="email" autocomplete="email" /><span class="field-msg" data-msg="email"></span></label>
+            <label>ORCID<input type="text" data-f="orcid" placeholder="0000-0000-0000-000X" /><span class="field-msg" data-msg="orcid"></span></label>
+          </div>
+          <h3 class="tab-section-title">Roles &amp; flags</h3>
+          <fieldset class="checks">
+            <legend class="visually-hidden">Author flags</legend>
+            <label class="chk"><input type="checkbox" data-f="corresponding" /> Corresponding author</label>
+            <label class="chk"><input type="checkbox" data-f="equalContribution" /> Equal contribution</label>
+            <label class="inline-select" data-equal-symbol-wrap hidden>Group symbol:
+              <select data-f="equalSymbol">
+                <option value="*">*</option>
+                <option value="†">†</option>
+                <option value="‡">‡</option>
+                <option value="§">§</option>
+                <option value="¶">¶</option>
+              </select>
+            </label>
+            <label class="chk"><input type="checkbox" data-f="senior" /> Senior author</label>
+            <label class="chk"><input type="checkbox" data-f="deceased" /> Deceased</label>
+          </fieldset>
+        </section>
 
-        <fieldset class="affil-fieldset">
-          <legend>Affiliations</legend>
-          <div class="affiliations" data-affil-list></div>
-          <button type="button" class="btn btn-sm btn-add-affil">+ Add affiliation</button>
-        </fieldset>
-
-        <label class="block">Present address (optional, for affiliation changes during peer review)
-          <textarea data-f="presentAddress" rows="2" placeholder="Present address: Dept. of …"></textarea>
-        </label>
-
-        <fieldset class="checks">
-          <legend class="visually-hidden">Author flags</legend>
-          <label class="chk"><input type="checkbox" data-f="corresponding" /> Corresponding author</label>
-          <label class="chk"><input type="checkbox" data-f="equalContribution" /> Equal contribution</label>
-          <label class="inline-select" data-equal-symbol-wrap hidden>Group symbol:
-            <select data-f="equalSymbol">
-              <option value="*">*</option>
-              <option value="†">†</option>
-              <option value="‡">‡</option>
-              <option value="§">§</option>
-              <option value="¶">¶</option>
-            </select>
+        <!-- TAB: Affiliations -->
+        <section class="author-tab-pane" data-tab-pane="affiliations" hidden>
+          <h3 class="tab-section-title">Affiliations</h3>
+          <fieldset class="affil-fieldset">
+            <legend class="visually-hidden">Affiliations</legend>
+            <div class="affiliations" data-affil-list></div>
+            <button type="button" class="btn btn-sm btn-add-affil">+ Add affiliation</button>
+          </fieldset>
+          <label class="block">Present address (optional, for affiliation changes during peer review)
+            <textarea data-f="presentAddress" rows="2" placeholder="Present address: Dept. of …"></textarea>
           </label>
-          <label class="chk"><input type="checkbox" data-f="senior" /> Senior author</label>
-          <label class="chk"><input type="checkbox" data-f="deceased" /> Deceased</label>
-        </fieldset>
+        </section>
 
-        <details class="credit-details">
-          <summary>CRediT contribution roles</summary>
+        <!-- TAB: CRediT -->
+        <section class="author-tab-pane" data-tab-pane="credit" hidden>
+          <h3 class="tab-section-title">CRediT contribution roles</h3>
           <p class="credit-help">Tick the roles this author contributed. <a href="https://credit.niso.org/" target="_blank" rel="noopener">CRediT taxonomy</a>.</p>
           <div class="credit-grid" data-credit-grid></div>
-        </details>
+        </section>
 
-        <details class="profiles-details">
-          <summary>Academic & social profiles</summary>
+        <!-- TAB: Profiles -->
+        <section class="author-tab-pane" data-tab-pane="profiles" hidden>
+          <h3 class="tab-section-title">Academic &amp; social profiles</h3>
           <div class="grid-2">
             <label>Google Scholar<input type="url" data-f="scholar" placeholder="https://scholar.google.com/…" /></label>
             <label>ResearchGate<input type="url" data-f="researchgate" placeholder="https://researchgate.net/profile/…" /></label>
@@ -331,7 +427,7 @@
             <label>Personal website<input type="url" data-f="website" placeholder="https://…" /></label>
             <label>OSF profile<input type="url" data-f="osf" placeholder="https://osf.io/…" /></label>
           </div>
-        </details>
+        </section>
       </div>
     </article>
   </template>
