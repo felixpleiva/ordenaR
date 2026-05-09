@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ordenaR — Author Manager</title>
+  <meta name="description" content="Arrange authors, affiliations, and ORCIDs — without the Excel chaos. Free, open-source, runs entirely in your browser." />
+  <meta property="og:title" content="ordenaR — Author Manager" />
+  <meta property="og:description" content="Arrange authors, affiliations, and ORCIDs — without the Excel chaos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- SheetJS (MIT) — parses xlsx, xls, csv, tsv, ods in the browser -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- docx.js (MIT) — generates real .docx files in the browser -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+</head>
+<body>
+  <header class="app-header" role="banner">
+    <div class="header-inner">
+      <h1 class="brand">
+        <svg class="brand-logo" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true">
+          <rect x="2" y="2" width="36" height="36" rx="6" fill="none" stroke="#5B5BF6" stroke-width="2"/>
+          <text x="20" y="27" text-anchor="middle" font-family="Source Serif Pro,Georgia,serif"
+                font-size="22" font-weight="700" fill="#1B1F3B">o<tspan fill="#5B5BF6" font-size="24" font-weight="800">R</tspan></text>
+        </svg>
+        <span class="brand-text">ordena<span class="brand-r">R</span></span>
+        <span class="brand-sub">Author Manager</span>
+      </h1>
+      <div class="header-actions">
+        <a href="../index.html" class="btn btn-ghost" aria-label="Back to ordenaR home">← Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       INVITATION MODE — shown when ?invite=… is in the URL.
+       The corresponding author NEVER sees this panel; coauthors who
+       receive an invite link see ONLY this panel.
+       ============================================================ -->
+  <main class="app-main invite-mode" id="invite-view" hidden>
+    <section class="panel invite-intro">
+      <h2>Add your details to: <span id="invite-project-title">…</span></h2>
+      <p class="invite-blurb">
+        You've been invited as a coauthor on this project. Fill in your details below — they stay in your browser.
+        When you're done, click <strong>Send to corresponding author</strong>; your email client will open with your
+        information pre-filled. (No backend, no account, no tracking.)
+      </p>
+      <p class="invite-roster">You're joining: <span id="invite-roster">…</span></p>
+    </section>
+
+    <section class="panel form-panel" aria-label="Your author details">
+      <div class="panel-head">
+        <h2>Your details</h2>
+      </div>
+      <div id="invite-author-list" class="authors-list" aria-live="polite"></div>
+    </section>
+
+    <section class="panel invite-send">
+      <h2>Send your entry</h2>
+      <p>Click below to open your email client with your data pre-filled and addressed to the corresponding author.</p>
+      <div class="invite-actions">
+        <button type="button" id="btn-invite-send" class="btn btn-primary btn-lg" aria-label="Send entry to corresponding author">✉ Send to corresponding author</button>
+        <button type="button" id="btn-invite-download" class="btn" aria-label="Download my entry as JSON">⬇ Download my entry (JSON)</button>
+      </div>
+
+      <details class="invite-fallback">
+        <summary>Email client didn't open? Copy &amp; paste manually</summary>
+        <p>Copy the text below and paste it into a new email to <span id="invite-corr-email">the corresponding author</span>.</p>
+        <textarea id="invite-fallback-text" rows="14" readonly aria-label="Email body to copy"></textarea>
+        <button type="button" id="btn-invite-copy" class="btn" aria-label="Copy email body to clipboard">Copy to clipboard</button>
+      </details>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       NORMAL MODE — corresponding author's main editing view.
+       ============================================================ -->
+  <main class="app-main normal-mode" id="normal-view">
+    <section class="project-bar" aria-label="Project metadata">
+      <label for="project-title" class="project-label">Project title</label>
+      <input id="project-title" type="text" placeholder="e.g. Effects of climate on amphibian populations" aria-label="Project title" />
+      <div class="project-actions">
+        <button type="button" id="btn-add-author" class="btn btn-primary" aria-label="Add new author">+ Add author</button>
+        <button type="button" id="btn-import-spreadsheet" class="btn" aria-label="Import authors from Excel or CSV spreadsheet">📥 Import from spreadsheet (Excel/CSV)</button>
+        <input type="file" id="file-import-spreadsheet" accept=".xlsx,.xls,.csv,.tsv,.ods" hidden />
+        <button type="button" id="btn-reset" class="btn btn-danger" aria-label="Reset and clear all">Reset</button>
+      </div>
+    </section>
+
+    <div class="layout">
+      <!-- LEFT COLUMN -->
+      <div class="left-col">
+        <section class="panel form-panel" aria-label="Authors form">
+          <div class="panel-head">
+            <h2>Authors</h2>
+            <span class="hint">Drag <span aria-hidden="true">⋮⋮</span> to reorder. Data autosaves locally.</span>
+          </div>
+          <div class="sort-toolbar" role="toolbar" aria-label="Sort authors">
+            <label class="sort-label">Sort:
+              <select id="sort-mode" aria-label="Author sort mode">
+                <option value="manual">Manual (drag &amp; drop)</option>
+                <option value="alpha">Alphabetical (by last name)</option>
+              </select>
+            </label>
+            <label class="chk inline">
+              <input type="checkbox" id="keep-senior-end" />
+              Keep senior authors at the end
+            </label>
+            <span id="sort-note" class="sort-note" aria-live="polite"></span>
+          </div>
+
+          <div id="authors-list" class="authors-list" aria-live="polite"></div>
+          <div class="empty-state" id="empty-state" hidden>
+            <p>No authors yet. Click <strong>+ Add author</strong> to begin.</p>
+          </div>
+        </section>
+
+        <!-- ===== INVITE PANEL — primary CTA ===== -->
+        <section class="panel invite-cta-panel" aria-label="Invite coauthors">
+          <div class="invite-cta-head">
+            <h2>Invite coauthors</h2>
+            <p class="hint">Send each coauthor a link. They fill in their own block and email the JSON back. No accounts, no logins.</p>
+          </div>
+          <div class="invite-cta-body">
+            <button type="button" id="btn-generate-invite" class="btn btn-primary btn-lg" aria-label="Generate invitation link">🔗 Generate invitation link</button>
+            <div id="invite-link-result" class="invite-link-result" hidden>
+              <label>Invitation link
+                <input type="text" id="invite-link-out" readonly aria-label="Invitation link" />
+              </label>
+              <div class="invite-link-actions">
+                <button type="button" id="btn-copy-invite" class="btn">Copy link</button>
+                <button type="button" id="btn-mail-invite" class="btn">Email it</button>
+              </div>
+              <small class="hint">Set yourself as <em>Corresponding author</em> with a valid email and a project title before generating, so coauthors know where to send their entry.</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== GITHUB SOURCE BADGE (shown when project loaded from GitHub) ===== -->
+        <div id="github-source-badge" class="github-source-badge" hidden>
+          <span class="gh-icon" aria-hidden="true">📂</span>
+          <span>Loaded from <a id="gh-source-link" href="#" target="_blank" rel="noopener"></a> · <code id="gh-source-sha">…</code></span>
+          <button type="button" id="btn-gh-refresh" class="btn btn-sm" aria-label="Re-fetch authors.json from GitHub">Refresh</button>
+        </div>
+
+        <!-- ===== COAUTHOR ENTRIES PANEL ===== -->
+        <section class="panel coauthor-entries-panel" aria-label="Coauthor entries">
+          <details open>
+            <summary>
+              <h2>Coauthor entries</h2>
+              <span class="hint">Paste a coauthor's reply or drop their JSON. Review before merging.</span>
+            </summary>
+            <div class="entries-actions">
+              <button type="button" id="btn-paste-entry" class="btn">Paste from email</button>
+              <button type="button" id="btn-upload-entry" class="btn">Upload JSON file</button>
+              <input type="file" id="file-import-author" accept="application/json,.json,.txt" hidden />
+            </div>
+            <div id="paste-area-wrap" hidden>
+              <textarea id="paste-area" rows="8" placeholder="Paste the coauthor's email body or JSON here. The BEGIN/END markers will be detected automatically."></textarea>
+              <div class="entries-actions">
+                <button type="button" id="btn-paste-confirm" class="btn btn-primary">Detect entry</button>
+                <button type="button" id="btn-paste-cancel" class="btn">Cancel</button>
+              </div>
+            </div>
+            <div id="pending-list" class="pending-list" aria-live="polite"></div>
+            <p id="pending-empty" class="empty-state-sm">No pending entries. Coauthor JSON will appear here for review.</p>
+          </details>
+        </section>
+
+
+      </div>
+
+      <!-- RIGHT COLUMN: preview / output -->
+      <section class="panel preview-panel" aria-label="Live preview and export">
+        <div class="panel-head">
+          <h2>Output</h2>
+          <div class="format-select-wrap">
+            <label for="format-select" class="visually-hidden">Output format</label>
+            <select id="format-select" aria-label="Output format">
+              <optgroup label="Plain text — Generic">
+                <option value="nature">Nature / Science</option>
+                <option value="elsevier">Elsevier</option>
+              </optgroup>
+              <optgroup label="Plain text — Journal-specific">
+                <option value="plos">PLOS family</option>
+                <option value="cell">Cell Press</option>
+                <option value="pnas">PNAS</option>
+                <option value="elife">eLife</option>
+                <option value="mdpi">MDPI generic</option>
+                <option value="wiley">Wiley generic</option>
+                <option value="frontiers">Frontiers</option>
+                <option value="royal-society">Royal Society</option>
+                <option value="nature-comms">Nature Communications</option>
+                <option value="nature-methods">Nature Methods</option>
+                <option value="agu">AGU journals (JGR, GRL, WRR)</option>
+                <option value="apa">APA — psychology</option>
+                <option value="vancouver">Vancouver — medical</option>
+              </optgroup>
+              <optgroup label="Ecology &amp; Evolution">
+                <option value="ecology-letters">Ecology Letters</option>
+                <option value="bes">British Ecological Society suite</option>
+                <option value="esa">Ecological Society of America</option>
+                <option value="oikos-nordic">Oikos / Ecography (Nordic)</option>
+                <option value="evolution">Evolution / Evolution Letters</option>
+                <option value="mol-ecol">Molecular Ecology</option>
+                <option value="jeb">Journal of Evolutionary Biology</option>
+                <option value="am-nat">The American Naturalist</option>
+                <option value="tree">Trends in Ecology &amp; Evolution</option>
+                <option value="gcb">Global Change Biology</option>
+                <option value="conservation">Conservation Biology</option>
+                <option value="behav-ecol">Behavioral Ecology (Oxford)</option>
+                <option value="heredity-genetics">Heredity / Genetics</option>
+                <option value="bmc-ecol-evol">BMC Ecology and Evolution</option>
+                <option value="annual-review">Annual Review of Ecol., Evol. &amp; Syst.</option>
+              </optgroup>
+              <optgroup label="LaTeX">
+                <option value="elsarticle">elsarticle</option>
+                <option value="springer">Springer (svjour3)</option>
+                <option value="ieee">IEEE / generic</option>
+              </optgroup>
+              <optgroup label="Bibliographic / Interchange">
+                <option value="quarto">Quarto / RMarkdown YAML</option>
+                <option value="word">Word-ready (rich HTML)</option>
+                <option value="bibtex">BibTeX author field</option>
+                <option value="csl-json">CSL JSON (Zotero, Mendeley)</option>
+                <option value="endnote-xml">EndNote XML</option>
+              </optgroup>
+              <optgroup label="Markdown / Supplementary">
+                <option value="profiles-md">Author profiles (Markdown)</option>
+                <option value="credit">CRediT statement</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div class="output-actions">
+          <button type="button" id="btn-copy-output" class="btn" aria-label="Copy output to clipboard">Copy</button>
+          <button type="button" id="btn-download-output" class="btn" aria-label="Download output">Download</button>
+          <button type="button" id="btn-download-docx" class="btn" aria-label="Download Word .docx file">📄 Download Word (.docx)</button>
+        </div>
+
+        <pre id="output-preview" class="output-preview" tabindex="0" aria-label="Formatted output preview"></pre>
+        <div id="output-rich" class="output-rich" hidden aria-label="Rich preview"></div>
+
+        <!-- Backup (smaller, less prominent) -->
+        <div class="backup-panel">
+          <h3>Backup</h3>
+          <div class="entries-actions">
+            <button type="button" id="btn-export-project" class="btn btn-sm" aria-label="Download full project JSON">Export project JSON</button>
+            <button type="button" id="btn-import-project" class="btn btn-sm" aria-label="Load full project JSON">Import project JSON</button>
+            <button type="button" id="btn-export-csv" class="btn btn-sm" aria-label="Export CSV">Export CSV</button>
+            <input type="file" id="file-import-project" accept="application/json,.json" hidden />
+          </div>
+          <small class="hint">Master backup — keep one copy of the full project JSON in case your browser cache is cleared.</small>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <small>ordena<span class="brand-r">R</span> · MIT licensed · Your data never leaves your browser.</small>
+  </footer>
+
+  <!-- Author card template -->
+  <template id="author-template">
+    <article class="author-card" data-author>
+      <header class="author-head">
+        <span class="drag-handle" draggable="true" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</span>
+        <button type="button" class="collapse-toggle" aria-expanded="true" aria-label="Collapse author">▾</button>
+        <span class="author-summary"></span>
+        <div class="author-actions">
+          <button type="button" class="btn btn-sm btn-export-author" aria-label="Export this author as JSON">Export</button>
+          <button type="button" class="btn btn-sm btn-danger btn-remove-author" aria-label="Remove author">Remove</button>
+        </div>
+      </header>
+
+      <div class="author-body">
+        <div class="grid-3">
+          <label>First name<input type="text" data-f="firstName" autocomplete="given-name" /></label>
+          <label>Middle name(s)<input type="text" data-f="middleName" /></label>
+          <label>Last name<input type="text" data-f="lastName" autocomplete="family-name" /></label>
+        </div>
+        <div class="grid-2">
+          <label>Email<input type="email" data-f="email" autocomplete="email" /><span class="field-msg" data-msg="email"></span></label>
+          <label>ORCID<input type="text" data-f="orcid" placeholder="0000-0000-0000-000X" /><span class="field-msg" data-msg="orcid"></span></label>
+        </div>
+
+        <fieldset class="affil-fieldset">
+          <legend>Affiliations</legend>
+          <div class="affiliations" data-affil-list></div>
+          <button type="button" class="btn btn-sm btn-add-affil">+ Add affiliation</button>
+        </fieldset>
+
+        <label class="block">Present address (optional, for affiliation changes during peer review)
+          <textarea data-f="presentAddress" rows="2" placeholder="Present address: Dept. of …"></textarea>
+        </label>
+
+        <fieldset class="checks">
+          <legend class="visually-hidden">Author flags</legend>
+          <label class="chk"><input type="checkbox" data-f="corresponding" /> Corresponding author</label>
+          <label class="chk"><input type="checkbox" data-f="equalContribution" /> Equal contribution</label>
+          <label class="inline-select" data-equal-symbol-wrap hidden>Group symbol:
+            <select data-f="equalSymbol">
+              <option value="*">*</option>
+              <option value="†">†</option>
+              <option value="‡">‡</option>
+              <option value="§">§</option>
+              <option value="¶">¶</option>
+            </select>
+          </label>
+          <label class="chk"><input type="checkbox" data-f="senior" /> Senior author</label>
+          <label class="chk"><input type="checkbox" data-f="deceased" /> Deceased</label>
+        </fieldset>
+
+        <details class="credit-details">
+          <summary>CRediT contribution roles</summary>
+          <p class="credit-help">Tick the roles this author contributed. <a href="https://credit.niso.org/" target="_blank" rel="noopener">CRediT taxonomy</a>.</p>
+          <div class="credit-grid" data-credit-grid></div>
+        </details>
+
+        <details class="profiles-details">
+          <summary>Academic & social profiles</summary>
+          <div class="grid-2">
+            <label>Google Scholar<input type="url" data-f="scholar" placeholder="https://scholar.google.com/…" /></label>
+            <label>ResearchGate<input type="url" data-f="researchgate" placeholder="https://researchgate.net/profile/…" /></label>
+            <label>GitHub username<input type="text" data-f="github" placeholder="username" /></label>
+            <label>Bluesky handle<input type="text" data-f="bluesky" placeholder="@user.bsky.social" /></label>
+            <label>Mastodon handle<input type="text" data-f="mastodon" placeholder="@user@server" /></label>
+            <label>X / Twitter handle<input type="text" data-f="twitter" placeholder="@user" /></label>
+            <label>LinkedIn URL<input type="url" data-f="linkedin" placeholder="https://linkedin.com/in/…" /></label>
+            <label>Personal website<input type="url" data-f="website" placeholder="https://…" /></label>
+            <label>OSF profile<input type="url" data-f="osf" placeholder="https://osf.io/…" /></label>
+          </div>
+        </details>
+      </div>
+    </article>
+  </template>
+
+  <!-- Affiliation row template -->
+  <template id="affil-template">
+    <div class="affil-row" data-affil>
+      <div class="grid-4">
+        <label>Department<input type="text" data-af="department" /></label>
+        <label>Institution<input type="text" data-af="institution" /></label>
+        <label>City<input type="text" data-af="city" /></label>
+        <label>Country<input type="text" data-af="country" /></label>
+      </div>
+      <button type="button" class="btn btn-sm btn-danger btn-remove-affil" aria-label="Remove this affiliation">×</button>
+    </div>
+  </template>
+
+
+  <!-- Pending entry card template -->
+  <template id="pending-template">
+    <article class="pending-card">
+      <header class="pending-head">
+        <span class="pending-name"></span>
+        <span class="pending-flags"></span>
+      </header>
+      <div class="pending-body"></div>
+      <footer class="pending-foot">
+        <button type="button" class="btn btn-primary btn-sm btn-pending-approve">Approve &amp; merge</button>
+        <button type="button" class="btn btn-sm btn-pending-edit">Edit before merging</button>
+        <button type="button" class="btn btn-sm btn-danger btn-pending-reject">Reject</button>
+      </footer>
+    </article>
+  </template>
+
+  <!-- ============================================================
+       SPREADSHEET IMPORT — Column Mapping Modal
+       ============================================================ -->
+  <div id="col-map-overlay" class="col-map-overlay" role="dialog" aria-modal="true" aria-labelledby="col-map-title" hidden>
+    <div class="col-map-dialog">
+      <h2 id="col-map-title">Map spreadsheet columns</h2>
+      <p class="col-map-filename" id="col-map-filename"></p>
+      <div class="col-map-scroll">
+        <table class="col-map-table" id="col-map-table">
+          <thead><tr><th>Spreadsheet column</th><th>ordenaR field</th></tr></thead>
+          <tbody id="col-map-tbody"></tbody>
+        </table>
+      </div>
+      <p class="col-map-summary" id="col-map-summary"></p>
+      <div class="col-map-actions">
+        <button type="button" id="btn-col-map-cancel" class="btn">Cancel</button>
+        <button type="button" id="btn-col-map-import" class="btn btn-primary">Import authors</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="import-toast" class="import-toast" role="alert" aria-live="assertive" hidden></div>
+
+  <script src="journals.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

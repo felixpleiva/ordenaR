@@ -1,0 +1,33 @@
+---
+title: "Author Manager"
+page-layout: full
+toc: false
+---
+
+The Author Manager is a single-page application that runs entirely in your browser. Your data is saved to `localStorage`; nothing is sent to a server.
+
+::: {.callout-tip}
+**The recommended workflow** — fill in your own block first, set yourself as **Corresponding author**, then click **Generate invitation link**. Send the link to each coauthor by email. They land on a simplified form, fill in their details, and click **Send to corresponding author** — their email client opens with a JSON payload addressed to you. Paste each reply into the *Coauthor entries* panel for review.
+:::
+
+<iframe class="af-tool-frame"
+        src="tool/index.html"
+        title="ordenaR Author Manager"
+        loading="lazy"
+        allow="clipboard-write">
+</iframe>
+
+::: {.callout-note collapse="true"}
+## Open the tool in a new tab
+
+If the embedded tool feels cramped, [open it standalone](tool/index.html){target="_blank"}.
+:::
+
+## Tips & shortcuts
+
+- **Drag the `⋮⋮` handle** on the left of any author card to reorder authors (only when sort mode is "Manual").
+- **Sort mode** has two settings: Manual and Alphabetical (by last name). When you switch back to manual, the current displayed order is frozen as the new manual order.
+- **ORCID validation** is live; a green ✓ means the checksum (ISO 7064 MOD 11-2) is valid.
+- **Affiliation deduplication** is automatic: if two authors share an exact-match institution + city + country + department, they get the same superscript.
+- The output panel updates as you type. Try switching the format dropdown — your data is the same; only the rendering changes.
+- The **Coauthor entries** panel detects the `BEGIN/END ORDENAR ENTRY` markers in pasted email text, so you can paste the entire email body and it will extract the JSON.

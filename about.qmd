@@ -1,0 +1,40 @@
+---
+title: "About"
+description: "Author, citation, and license."
+---
+
+## Author
+
+**Félix Leiva** — academic researcher and the author of ordena[R]{.brand-r}.
+
+- GitHub: [@felixpleiva](https://github.com/felixpleiva)
+
+## Citation
+
+If ordena[R]{.brand-r} supports your work, please cite it:
+
+> Leiva, F. P. (2026). *ordena[R]{.brand-r}: a free, open-source tool for managing author lists in academic papers* (Version 1.0.0) [Software]. <https://felixpleiva.github.io/ordenaR/>
+
+The repository ships a [`CITATION.cff`](https://github.com/felixpleiva/ordenaR/blob/main/CITATION.cff) file in [Citation File Format v1.2.0](https://citation-file-format.github.io/), so GitHub will display a **"Cite this repository"** button at the top right of the [repo page](https://github.com/felixpleiva/ordenaR) and offer BibTeX/APA conversions automatically.
+
+A BibTeX entry:
+
+```bibtex
+@software{leiva_ordenaR_2026,
+  author       = {Leiva, F{\'e}lix P.},
+  title        = {{ordenaR}: A free, open-source tool for managing author lists in academic papers},
+  year         = {2026},
+  version      = {1.0.0},
+  url          = {https://felixpleiva.github.io/ordenaR/},
+  note         = {MIT licensed}
+}
+```
+
+## License
+
+- **Code** — [MIT License](https://github.com/felixpleiva/ordenaR/blob/main/LICENSE). Use it in your lab, fork it, modify it, ship it. Attribution is appreciated but not legally required.
+- **Documentation** (this site, README, etc.) — [CC-BY 4.0](https://github.com/felixpleiva/ordenaR/blob/main/LICENSE-docs). Re-use freely with attribution.
+
+## Reporting issues
+
+GitHub Issues: <https://github.com/felixpleiva/ordenaR/issues>.

@@ -1,0 +1,51 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - "tool/**"
+    - "images/**"
+
+website:
+  title: "ordenaR"
+  description: "Arrange authors, affiliations, and ORCIDs — without the Excel chaos."
+  site-url: https://felixpleiva.github.io/ordenaR/
+  repo-url: https://github.com/felixpleiva/ordenaR
+  page-navigation: true
+  navbar:
+    background: light
+    pinned: true
+    left:
+      - href: index.qmd
+        text: Home
+      - href: author-manager.qmd
+        text: Author Manager
+      - href: faq.qmd
+        text: FAQ
+      - href: about.qmd
+        text: About
+    right:
+      - icon: github
+        href: https://github.com/felixpleiva/ordenaR
+        aria-label: GitHub repository
+  page-footer:
+    left: "© 2026 Félix Leiva · MIT (code) · CC-BY 4.0 (docs)"
+    right:
+      - icon: github
+        href: https://github.com/felixpleiva/ordenaR
+
+format:
+  html:
+    theme:
+      light: cosmo
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    mainfont: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    monofont: "ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontsize: "1rem"
+    grid:
+      sidebar-width: 220px
+      body-width: 800px
+    link-external-newwindow: true
+    anchor-sections: true
+    smooth-scroll: true

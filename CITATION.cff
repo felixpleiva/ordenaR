@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use ordenaR in your research, please cite it as below."
+title: "ordenaR: a free, open-source tool for managing author lists in academic papers"
+abstract: >
+  ordenaR is a static, browser-based tool that helps academic authors generate
+  properly formatted author/affiliation/email/ORCID lists for paper submissions.
+  It supports multiple journal style families (Nature, Elsevier, several LaTeX
+  templates, Quarto YAML, BibTeX, Word HTML), validates ORCIDs, deduplicates
+  affiliations, and uses a simple invite-link + mailto workflow for collaboration.
+type: software
+version: "1.0.0"
+date-released: "2026-01-01"
+license: MIT
+url: "https://felixpleiva.github.io/ordenaR/"
+repository-code: "https://github.com/felixpleiva/ordenaR"
+authors:
+  - family-names: "Leiva"
+    given-names: "Félix P."
+    affiliation: "Independent researcher"
+    website: "https://github.com/felixpleiva"
+keywords:
+  - "academic authorship"
+  - "ORCID"
+  - "open science"
+  - "Quarto"
+  - "JavaScript"
+preferred-citation:
+  type: software
+  title: "ordenaR: a free, open-source tool for managing author lists in academic papers"
+  authors:
+    - family-names: "Leiva"
+      given-names: "Félix P."
+  year: 2026
+  version: "1.0.0"
+  url: "https://felixpleiva.github.io/ordenaR/"

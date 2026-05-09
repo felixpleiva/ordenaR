@@ -1,0 +1,31 @@
+Documentation License — Creative Commons Attribution 4.0 International (CC-BY 4.0)
+
+Copyright (c) 2026 Félix Leiva
+
+The documentation files in this repository — including but not limited to
+all `.qmd` files, README.md, CONTRIBUTING.md, and any rendered HTML output
+in the `_site/` directory — are licensed under the Creative Commons
+Attribution 4.0 International License.
+
+You are free to:
+
+  - Share — copy and redistribute the material in any medium or format
+  - Adapt — remix, transform, and build upon the material for any purpose,
+    even commercially.
+
+Under the following terms:
+
+  - Attribution — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made. You may do so in any
+    reasonable manner, but not in any way that suggests the licensor endorses
+    you or your use.
+
+  - No additional restrictions — You may not apply legal terms or
+    technological measures that legally restrict others from doing anything
+    the license permits.
+
+Full legal text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Code in this repository (including everything under `tool/` and any
+JavaScript, CSS, or HTML source files used by the application) is licensed
+separately under the MIT License — see the LICENSE file.

@@ -1,0 +1,78 @@
+---
+title: "FAQ"
+description: "Common questions about ordenaR."
+---
+
+## Privacy & data
+
+### Where does my data go?
+
+It stays in your browser's `localStorage`. ordena[R]{.brand-r} makes no network calls at runtime.
+
+### Is there any analytics or tracking?
+
+No. No Google Analytics, no Plausible, no fingerprinting, no error reporting.
+
+### What happens if I clear my browser cache?
+
+You lose the project. **Always export a project JSON backup** (button in the right-hand *Backup* panel) and keep one copy. JSON is plain text — versionable, diffable, archivable.
+
+### Can multiple people edit at the same time?
+
+No. ordena[R]{.brand-r} deliberately has no real-time collaboration. The corresponding author owns the master copy; coauthors fill their own entries via the invite link, and the corresponding consolidates. One source of truth, one merge step, no arguments.
+
+## Workflow
+
+### What if my coauthor's email client doesn't open?
+
+The invitation page has a fallback: a *"Email client didn't open?"* expandable panel. Open it; the same email body is shown in a textarea with a **Copy to clipboard** button. The coauthor pastes that into their webmail (Gmail, Outlook on the web, university roundcube, etc.) and sends manually.
+
+### What if my coauthor isn't comfortable with the tool?
+
+Skip the invite link. Ask them for the data in any format (email, Slack, Word doc) and enter it yourself. The tool's value to *you* is the same.
+
+### How do I handle co-first authors?
+
+On each co-first author's card, tick **Equal contribution** and pick a group symbol (e.g. `*`). Use the same symbol for everyone in the group. To alphabetize them automatically, switch the sort mode to **Alphabetical**.
+
+### Can I have multiple equal-contribution groups (e.g. co-first AND co-last)?
+
+Yes. Use one symbol (`*`) for the co-first group and a different symbol (`†`) for the co-last group. The output formats handle each group independently.
+
+## Compatibility
+
+### Which browsers are supported?
+
+Any modern browser updated within the last 2 years: Chrome, Firefox, Safari, Edge. ordena[R]{.brand-r} uses no obscure web APIs — just standard Clipboard, Drag-and-Drop, FileReader, and `localStorage`. Mobile-friendly down to 375 px wide.
+
+### Does it work offline?
+
+Yes, after the first load. The site is fully static; once your browser has cached `index.html`, `app.js`, and `styles.css`, you can disconnect from the internet and keep editing.
+
+## Outputs
+
+### Which journals are supported?
+
+ordena[R]{.brand-r} exports 30+ formats that cover the dominant style families: generic plain text (Nature/Science, Elsevier), journal-specific plain text (PLOS, Cell Press, PNAS, eLife, MDPI, Wiley, Frontiers, Royal Society, Nature Communications, Nature Methods, AGU, APA, Vancouver), an Ecology & Evolution suite, LaTeX (elsarticle, Springer svjour3, IEEE), Quarto/RMarkdown YAML, Word HTML, BibTeX, CSL JSON, EndNote XML, a Markdown profiles table, and a [CRediT statement](https://credit.niso.org/) listing each author's contributor roles.
+
+### What if my journal isn't supported?
+
+Most journals follow one of the major publisher patterns (Elsevier, Wiley, Springer, Cell). Pick the closest match — the output is almost always copy-pasteable as-is. The plain-text Nature/Science format is also a safe universal fallback.
+
+### How is ORCID validated?
+
+Using the official ISO 7064 MOD 11-2 checksum on the 16-digit identifier. The validation is local; we never query orcid.org.
+
+### How are duplicate affiliations deduplicated?
+
+By exact-match normalized comparison of `department + institution + city + country`. Lowercasing, whitespace collapse, and trimming are applied before comparison.
+
+## Open source
+
+### What's the license?
+
+MIT for the code, CC-BY 4.0 for the documentation. See `LICENSE` and `LICENSE-docs` in the [GitHub repo](https://github.com/felixpleiva/ordenaR).
+
+### Where do I report a bug?
+
+GitHub Issues: <https://github.com/felixpleiva/ordenaR/issues>.
