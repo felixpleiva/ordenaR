@@ -1,0 +1,353 @@
+/* ordenaR — Quarto site overrides
+ * Vibrant, friendly palette: indigo / coral / sunshine / mint
+ * on a clean white surface. Built on top of the cosmo Bootstrap theme. */
+
+:root {
+  /* Surfaces */
+  --bg-page: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F4F4FB;
+  --bg-code: #F6F4FF;
+
+  /* Text */
+  --text-primary: #1B1F3B;
+  --text-secondary: #4A4E72;
+  --text-muted: #8084A6;
+
+  /* Borders */
+  --border-soft: #E4E2F2;
+  --border-medium: #C9C5E6;
+
+  /* Primary — vivid indigo/violet */
+  --accent-primary: #5B5BF6;
+  --accent-primary-hover: #4242E0;
+  --accent-primary-soft: #E5E4FF;
+
+  /* Secondary — sunny coral */
+  --accent-warm: #F26B5B;
+  --accent-warm-hover: #DB4F3E;
+  --accent-warm-soft: #FFE3DE;
+
+  /* Tertiary — fresh mint */
+  --accent-deep: #00B894;
+  --accent-deep-soft: #D8F7EE;
+
+  /* Highlight — sunshine yellow */
+  --accent-sun: #FFC93C;
+  --accent-sun-soft: #FFF4D2;
+
+  /* Status */
+  --success: #10B981;
+  --success-soft: #D1FAE5;
+  --warning: #F59E0B;
+  --warning-soft: #FEF3C7;
+  --danger: #EF4444;
+  --danger-soft: #FEE2E2;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(91, 91, 246, 0.06);
+  --shadow-md: 0 6px 16px rgba(91, 91, 246, 0.10);
+  --shadow-lg: 0 14px 36px rgba(91, 91, 246, 0.14);
+
+  /* Legacy aliases */
+  --af-accent: var(--accent-primary);
+  --af-accent-hover: var(--accent-primary-hover);
+  --af-bg: var(--bg-page);
+  --af-border: var(--border-soft);
+}
+
+/* ---------- Base ---------- */
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* Coral underline bar on h2 */
+h2 {
+  position: relative;
+  padding-bottom: 0.45em;
+  margin-top: 1.8em;
+}
+h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-warm) 100%);
+  border-radius: 2px;
+}
+
+/* ---------- Links ---------- */
+a, a:visited {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-warm);
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--accent-primary-hover);
+  text-decoration-color: var(--accent-warm-hover);
+}
+.navbar a, .nav-link, .btn, a.btn, a.af-cta { text-decoration: none !important; }
+
+/* ---------- Brand wordmark ---------- */
+.brand-r {
+  color: var(--accent-warm);
+  font-weight: 800;
+  font-size: 1.05em;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+}
+.navbar-brand {
+  font-family: "Inter", sans-serif;
+  font-weight: 800;
+  color: var(--text-primary) !important;
+}
+.navbar .nav-link { color: var(--text-secondary) !important; font-weight: 500; }
+.navbar .nav-link:hover, .navbar .nav-link.active {
+  color: var(--accent-primary) !important;
+}
+
+/* ---------- Hero on index.qmd ---------- */
+.af-hero {
+  padding: 72px 24px 52px;
+  text-align: center;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--border-soft);
+  background: linear-gradient(135deg, var(--accent-primary-soft) 0%, var(--accent-warm-soft) 50%, var(--accent-sun-soft) 100%);
+  border-radius: 0 0 16px 16px;
+}
+.af-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 0.4em;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-warm) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.af-hero h1::after { display: none; }
+.af-hero h2::after { display: none; }
+.af-hero p.lead, .af-hero .lead {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 720px;
+  margin: 0 auto 1.6em;
+}
+
+/* CTA */
+.af-cta {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%);
+  color: #fff !important;
+  text-decoration: none !important;
+  padding: 13px 26px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.af-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+  color: #fff !important;
+}
+.btn-outline-secondary {
+  background: var(--bg-card);
+  color: var(--accent-primary) !important;
+  border: 2px solid var(--accent-primary);
+  text-decoration: none !important;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+}
+.btn-outline-secondary:hover {
+  background: var(--accent-primary-soft);
+  color: var(--accent-primary-hover) !important;
+  border-color: var(--accent-primary-hover);
+}
+
+/* ---------- Feature cards on landing ---------- */
+.af-features {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin: 30px 0;
+}
+.af-features .card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+  position: relative;
+}
+.af-features .card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+.af-features .card h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  padding-bottom: 0.4em;
+  position: relative;
+}
+.af-features .card h3::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 28px; height: 3px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+.af-features .card:nth-child(3n+2) h3::after { background: var(--accent-warm); }
+.af-features .card:nth-child(3n+3) h3::after { background: var(--accent-deep); }
+
+/* ---------- Inline code & code blocks ---------- */
+code, .container code {
+  background: var(--bg-code);
+  color: var(--accent-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+pre, .container pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  box-shadow: var(--shadow-sm);
+}
+pre code, .container pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* ---------- Tables ---------- */
+table, .container table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th, .container th {
+  background: var(--accent-primary-soft);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: 1px solid var(--border-soft);
+  padding: 10px 12px;
+  text-align: left;
+}
+td, .container td {
+  border: 1px solid var(--border-soft);
+  padding: 10px 12px;
+}
+tbody tr:nth-child(even) td { background: var(--bg-subtle); }
+
+/* ---------- Blockquotes & callouts ---------- */
+blockquote, .container blockquote {
+  border-left: 4px solid var(--accent-primary);
+  padding: 10px 18px;
+  background: var(--accent-primary-soft);
+  margin: 16px 0;
+  border-radius: 0 8px 8px 0;
+  color: var(--text-secondary);
+}
+.callout-tip, .callout-note {
+  background: var(--accent-primary-soft);
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--accent-primary);
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+  margin: 16px 0;
+}
+.callout-tip strong, .callout-note strong { color: var(--accent-primary); }
+.callout-warning {
+  background: var(--accent-warm-soft);
+  border-left: 4px solid var(--accent-warm);
+}
+.callout-warning strong { color: var(--accent-warm-hover); }
+
+/* ---------- Step blocks ---------- */
+.af-step {
+  border-left: 4px solid var(--accent-primary);
+  padding: 12px 18px;
+  background: var(--bg-card);
+  margin: 14px 0;
+  border-radius: 0 8px 8px 0;
+  box-shadow: var(--shadow-sm);
+}
+.af-step strong { color: var(--accent-primary); }
+
+/* ---------- Embedded tool iframe ---------- */
+.af-tool-frame {
+  width: 100%;
+  min-height: 80vh;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Footer ---------- */
+.nav-footer, footer.site-footer, .page-footer {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border-soft);
+}
+.nav-footer a, footer.site-footer a { color: var(--accent-primary); }
+
+/* ---------- Bootstrap button overrides ---------- */
+.btn-primary {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--accent-primary-hover) !important;
+  border-color: var(--accent-primary-hover) !important;
+}
+
+/* ---------- Sidebar / TOC ---------- */
+#TOC a, .sidebar a, nav#toc-aside a {
+  color: var(--text-secondary);
+  text-decoration: none !important;
+}
+#TOC a:hover, .sidebar a:hover, nav#toc-aside a:hover,
+#TOC a.active, .sidebar a.active, nav#toc-aside a.active {
+  color: var(--accent-primary);
+  font-weight: 600;
+}

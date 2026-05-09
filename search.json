@@ -1,0 +1,121 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ordenaR",
+    "section": "",
+    "text": "A free, open-source tool that helps academic authors generate properly formatted author/affiliation/email/ORCID lists for paper submissions — and reformat them when journals change or affiliations shift during peer review.\n\nOpen the Author Manager   View on GitHub"
+  },
+  {
+    "objectID": "index.html#the-problem",
+    "href": "index.html#the-problem",
+    "title": "ordenaR",
+    "section": "The problem",
+    "text": "The problem\nYou finish a paper. You spend an hour collecting affiliations from twelve coauthors over email and Slack. You paste them into the Nature template. The paper is rejected. You resubmit to Elsevier — different format. By the time it goes to the next journal, three coauthors have moved institutions and one has a present address footnote. Excel sheets are flying around. Someone’s ORCID is wrong.\nordenaR replaces that ad-hoc workflow. Send each coauthor one link. They fill in their own block in their browser and email back a clean JSON entry. You drop it in. When affiliations or journals change, you re-export — no rework.\n\n\nImport Excel / CSV\nAlready collected author info in a spreadsheet? Upload it (xlsx, xls, csv, tsv, ods). ordenaR auto-detects the columns and lets you confirm the mapping before importing.\n\n\nWord (.docx) download\nDownload a real Word document with title, author byline (with proper superscript affiliation numbers), affiliations list, corresponding author info, and an author details table.\n\n\nSend one link, get back clean JSON\nThe corresponding author generates an invite link. Coauthors open it, fill their details, and the tool builds a pre-addressed email back to you. No accounts, no logins, no cloud.\n\n\nCRediT contributor roles\nTick the 14 official CRediT roles per author. The tool outputs a paper-ready statement and includes contributions in the Word download. CRediT columns in your spreadsheet are auto-detected on import.\n\n\n30+ output formats\nGeneric plain text (Nature/Science, Elsevier), journal-specific plain text (PLOS, Cell, PNAS, eLife, MDPI, Wiley, Frontiers, Royal Society, Nature Communications, Nature Methods, AGU, APA, Vancouver), a deep Ecology & Evolution suite, LaTeX (elsarticle, Springer, IEEE), Quarto YAML, Word HTML, BibTeX, CSL JSON, EndNote XML, and Markdown profiles — each with one click.\n\n\nSort flexibly\nSort manually (drag & drop) or alphabetically by last name. Optional “keep senior authors at the end”.\n\n\nORCID validation\nEvery ORCID is checked against the official ISO 7064 MOD 11-2 checksum, so you don’t ship typos.\n\n\nPrivacy by design\nNo backend, no analytics, no tracking. All data lives in localStorage in your browser.\n\n\nMobile-friendly\nWorks down to 375 px width. Keyboard-navigable."
+  },
+  {
+    "objectID": "index.html#how-it-works-in-60-seconds",
+    "href": "index.html#how-it-works-in-60-seconds",
+    "title": "ordenaR",
+    "section": "How it works in 60 seconds",
+    "text": "How it works in 60 seconds\n\nYou open the Author Manager, enter the project title, and fill in your own (corresponding author) block.\nClick Generate invitation link. Email it to each coauthor.\nEach coauthor opens the link, fills their own block, and clicks Send to corresponding author — their email client opens with their JSON entry pre-filled.\nYou paste each reply into the Coauthor entries panel. The tool flags duplicates and shows a preview before merging.\nPick a journal format from the dropdown. Copy or download. Done.\n\nWhen the paper bounces to a new journal, change the dropdown and re-export."
+  },
+  {
+    "objectID": "index.html#citation",
+    "href": "index.html#citation",
+    "title": "ordenaR",
+    "section": "Citation",
+    "text": "Citation\nIf ordenaR helps your work, please cite it. See the About page for the citation file (CITATION.cff)."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Félix Leiva — academic researcher and the author of ordenaR.\n\nGitHub: @felixpleiva"
+  },
+  {
+    "objectID": "about.html#author",
+    "href": "about.html#author",
+    "title": "About",
+    "section": "",
+    "text": "Félix Leiva — academic researcher and the author of ordenaR.\n\nGitHub: @felixpleiva"
+  },
+  {
+    "objectID": "about.html#citation",
+    "href": "about.html#citation",
+    "title": "About",
+    "section": "Citation",
+    "text": "Citation\nIf ordenaR supports your work, please cite it:\n\nLeiva, F. P. (2026). ordenaR: a free, open-source tool for managing author lists in academic papers (Version 1.0.0) [Software]. https://felixpleiva.github.io/ordenaR/\n\nThe repository ships a CITATION.cff file in Citation File Format v1.2.0, so GitHub will display a “Cite this repository” button at the top right of the repo page and offer BibTeX/APA conversions automatically.\nA BibTeX entry:\n@software{leiva_ordenaR_2026,\n  author       = {Leiva, F{\\'e}lix P.},\n  title        = {{ordenaR}: A free, open-source tool for managing author lists in academic papers},\n  year         = {2026},\n  version      = {1.0.0},\n  url          = {https://felixpleiva.github.io/ordenaR/},\n  note         = {MIT licensed}\n}"
+  },
+  {
+    "objectID": "about.html#license",
+    "href": "about.html#license",
+    "title": "About",
+    "section": "License",
+    "text": "License\n\nCode — MIT License. Use it in your lab, fork it, modify it, ship it. Attribution is appreciated but not legally required.\nDocumentation (this site, README, etc.) — CC-BY 4.0. Re-use freely with attribution."
+  },
+  {
+    "objectID": "about.html#reporting-issues",
+    "href": "about.html#reporting-issues",
+    "title": "About",
+    "section": "Reporting issues",
+    "text": "Reporting issues\nGitHub Issues: https://github.com/felixpleiva/ordenaR/issues."
+  },
+  {
+    "objectID": "author-manager.html",
+    "href": "author-manager.html",
+    "title": "Author Manager",
+    "section": "",
+    "text": "The Author Manager is a single-page application that runs entirely in your browser. Your data is saved to localStorage; nothing is sent to a server."
+  },
+  {
+    "objectID": "author-manager.html#tips-shortcuts",
+    "href": "author-manager.html#tips-shortcuts",
+    "title": "Author Manager",
+    "section": "Tips & shortcuts",
+    "text": "Tips & shortcuts\n\nDrag the ⋮⋮ handle on the left of any author card to reorder authors (only when sort mode is “Manual”).\nSort mode has two settings: Manual and Alphabetical (by last name). When you switch back to manual, the current displayed order is frozen as the new manual order.\nORCID validation is live; a green ✓ means the checksum (ISO 7064 MOD 11-2) is valid.\nAffiliation deduplication is automatic: if two authors share an exact-match institution + city + country + department, they get the same superscript.\nThe output panel updates as you type. Try switching the format dropdown — your data is the same; only the rendering changes.\nThe Coauthor entries panel detects the BEGIN/END ORDENAR ENTRY markers in pasted email text, so you can paste the entire email body and it will extract the JSON."
+  },
+  {
+    "objectID": "faq.html",
+    "href": "faq.html",
+    "title": "FAQ",
+    "section": "",
+    "text": "It stays in your browser’s localStorage. ordenaR makes no network calls at runtime.\n\n\n\nNo. No Google Analytics, no Plausible, no fingerprinting, no error reporting.\n\n\n\nYou lose the project. Always export a project JSON backup (button in the right-hand Backup panel) and keep one copy. JSON is plain text — versionable, diffable, archivable.\n\n\n\nNo. ordenaR deliberately has no real-time collaboration. The corresponding author owns the master copy; coauthors fill their own entries via the invite link, and the corresponding consolidates. One source of truth, one merge step, no arguments."
+  },
+  {
+    "objectID": "faq.html#privacy-data",
+    "href": "faq.html#privacy-data",
+    "title": "FAQ",
+    "section": "",
+    "text": "It stays in your browser’s localStorage. ordenaR makes no network calls at runtime.\n\n\n\nNo. No Google Analytics, no Plausible, no fingerprinting, no error reporting.\n\n\n\nYou lose the project. Always export a project JSON backup (button in the right-hand Backup panel) and keep one copy. JSON is plain text — versionable, diffable, archivable.\n\n\n\nNo. ordenaR deliberately has no real-time collaboration. The corresponding author owns the master copy; coauthors fill their own entries via the invite link, and the corresponding consolidates. One source of truth, one merge step, no arguments."
+  },
+  {
+    "objectID": "faq.html#workflow",
+    "href": "faq.html#workflow",
+    "title": "FAQ",
+    "section": "Workflow",
+    "text": "Workflow\n\nWhat if my coauthor’s email client doesn’t open?\nThe invitation page has a fallback: a “Email client didn’t open?” expandable panel. Open it; the same email body is shown in a textarea with a Copy to clipboard button. The coauthor pastes that into their webmail (Gmail, Outlook on the web, university roundcube, etc.) and sends manually.\n\n\nWhat if my coauthor isn’t comfortable with the tool?\nSkip the invite link. Ask them for the data in any format (email, Slack, Word doc) and enter it yourself. The tool’s value to you is the same.\n\n\nHow do I handle co-first authors?\nOn each co-first author’s card, tick Equal contribution and pick a group symbol (e.g. *). Use the same symbol for everyone in the group. To alphabetize them automatically, switch the sort mode to Alphabetical.\n\n\nCan I have multiple equal-contribution groups (e.g. co-first AND co-last)?\nYes. Use one symbol (*) for the co-first group and a different symbol (†) for the co-last group. The output formats handle each group independently."
+  },
+  {
+    "objectID": "faq.html#compatibility",
+    "href": "faq.html#compatibility",
+    "title": "FAQ",
+    "section": "Compatibility",
+    "text": "Compatibility\n\nWhich browsers are supported?\nAny modern browser updated within the last 2 years: Chrome, Firefox, Safari, Edge. ordenaR uses no obscure web APIs — just standard Clipboard, Drag-and-Drop, FileReader, and localStorage. Mobile-friendly down to 375 px wide.\n\n\nDoes it work offline?\nYes, after the first load. The site is fully static; once your browser has cached index.html, app.js, and styles.css, you can disconnect from the internet and keep editing."
+  },
+  {
+    "objectID": "faq.html#outputs",
+    "href": "faq.html#outputs",
+    "title": "FAQ",
+    "section": "Outputs",
+    "text": "Outputs\n\nWhich journals are supported?\nordenaR exports 30+ formats that cover the dominant style families: generic plain text (Nature/Science, Elsevier), journal-specific plain text (PLOS, Cell Press, PNAS, eLife, MDPI, Wiley, Frontiers, Royal Society, Nature Communications, Nature Methods, AGU, APA, Vancouver), an Ecology & Evolution suite, LaTeX (elsarticle, Springer svjour3, IEEE), Quarto/RMarkdown YAML, Word HTML, BibTeX, CSL JSON, EndNote XML, a Markdown profiles table, and a CRediT statement listing each author’s contributor roles.\n\n\nWhat if my journal isn’t supported?\nMost journals follow one of the major publisher patterns (Elsevier, Wiley, Springer, Cell). Pick the closest match — the output is almost always copy-pasteable as-is. The plain-text Nature/Science format is also a safe universal fallback.\n\n\nHow is ORCID validated?\nUsing the official ISO 7064 MOD 11-2 checksum on the 16-digit identifier. The validation is local; we never query orcid.org.\n\n\nHow are duplicate affiliations deduplicated?\nBy exact-match normalized comparison of department + institution + city + country. Lowercasing, whitespace collapse, and trimming are applied before comparison."
+  },
+  {
+    "objectID": "faq.html#open-source",
+    "href": "faq.html#open-source",
+    "title": "FAQ",
+    "section": "Open source",
+    "text": "Open source\n\nWhat’s the license?\nMIT for the code, CC-BY 4.0 for the documentation. See LICENSE and LICENSE-docs in the GitHub repo.\n\n\nWhere do I report a bug?\nGitHub Issues: https://github.com/felixpleiva/ordenaR/issues."
+  }
+]
