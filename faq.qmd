@@ -39,6 +39,45 @@ On each co-first author's card, tick **Equal contribution** and pick a group sym
 
 Yes. Use one symbol (`*`) for the co-first group and a different symbol (`†`) for the co-last group. The output formats handle each group independently.
 
+## Versioning across paper revisions
+
+### My paper went through revisions and authors changed something. Do I have to ask everyone again?
+
+No. Three possibilities, in order of effort:
+
+1. **You know the change** (typo, new email, reordered authors) → just edit the field directly in the app and re-export.
+2. **One coauthor changed their info** (new affiliation, new ORCID, redistributed CRediT) → click **✉ Invite via email** on their card. The email is pre-filled with their *current* data inside the `=== ORDENAR ENTRY ===` markers. They edit only what changed and reply. You paste the reply into **Paste invitation reply** — ordena[R]{.brand-r} matches them by email and updates the card.
+3. **Many changes / many new authors** → maintain a master Excel/CSV. When something changes, update the sheet and re-import via **Import from Excel/CSV**. Existing authors are matched by email and updated; new rows are added.
+
+The email field is the primary key for re-imports — keep emails stable across revisions.
+
+### Should I save a JSON backup at every revision stage?
+
+Yes — strongly recommended. Click **Export project (.json)** every time you reach a stable milestone:
+
+- Initial submission
+- After each round of revisions
+- Acceptance
+- Final published version
+
+Name the files like `ordenaR-mypaper-v1-submission.json`, `ordenaR-mypaper-v2-revision1.json`, etc., and keep them in the same folder as your manuscript.
+
+This gives you a versioned history. If someone asks *"what affiliation did I list at submission?"* six months later, you reload the v1 JSON via **Import project (.json)** and see exactly what was sent.
+
+### What if I switch computers or browsers between revisions?
+
+localStorage is browser-specific. Before switching:
+
+1. On the old browser: **Export project (.json)**.
+2. Move the JSON file (email, Dropbox, Drive, USB).
+3. On the new browser: open ordena[R]{.brand-r} → **Import project (.json)**.
+
+Everything is restored — authors, affiliations, CRediT, sort order, equal-contribution groups, current journal format.
+
+### Does ordenaR remember which journal I last used?
+
+Yes. The selected output format and sort mode are saved with the project, so reopening (or re-importing the JSON) brings you back exactly where you left off.
+
 ## Compatibility
 
 ### Which browsers are supported?
